@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Männer Kickbase</title>
+<meta name="description" content="Live-Stand, Strafenkasse und Saisonstatistik der Liga Männer Kickbase">
+<meta name="theme-color" content="#0E1733">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kickbase">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Big+Shoulders+Display:wght@700;800&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+:root {
+  color-scheme: dark;
+  --nacht: #0E1733;
+  --tafel: #16224A;
+  --tafel-hoch: #1C2B5A;
+  --linie: #26356A;
+  --kreide: #F3F0E8;
+  --nebel: #A9B3CF;
+  --flutlicht: #FFC247;
+  --offen: #3987E5;
+  --laeuft: #C98500;
+  --gespielt: #36446E;
+  --rot: #F0524F;
+  --gelb: #F5D547;
+  --gruen: #46C98C;
+  --display: "Big Shoulders Display", "Barlow", system-ui, sans-serif;
+  --text: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rand: 16px;
+  --unten: calc(64px + env(safe-area-inset-bottom));
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--nacht); color: var(--kreide);
+  font: 400 16px/1.45 var(--text); min-height: 100vh;
+  padding: env(safe-area-inset-top) 0 var(--unten);
+  -webkit-tap-highlight-color: transparent; overflow-x: hidden;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+:focus-visible { outline: 2px solid var(--flutlicht); outline-offset: 2px; border-radius: 4px; }
+.zahl { font-family: var(--display); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.leise { color: var(--nebel); }
+.wrap { max-width: 560px; margin: 0 auto; padding: 0 var(--rand); }
+
+/* Kopf */
+.kopf { position: sticky; top: 0; z-index: 5; background: rgba(14, 23, 51, .92); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--linie); }
+.kopf .wrap { display: flex; align-items: center; justify-content: space-between; height: 48px; }
+.liga { font: 800 20px/1 var(--display); letter-spacing: .02em; }
+.stand { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--nebel); padding: 8px 0 8px 8px; }
+.stand svg { width: 16px; height: 16px; }
+.stand.laedt svg { animation: drehen 1s linear infinite; }
+@keyframes drehen { to { transform: rotate(360deg); } }
+
+/* Spieltag-Kopf */
+.held { padding: 22px 0 6px; }
+.held h1 { margin: 0; font: 800 46px/0.95 var(--display); letter-spacing: .005em; }
+.held .lage { margin: 8px 0 0; font-size: 15px; color: var(--nebel); }
+.held .lage b { color: var(--flutlicht); font-weight: 600; }
+
+.zeiten { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 6px; margin: 16px 0 4px; }
+.zeit { border: 1px solid var(--linie); border-radius: 8px; padding: 7px 6px 6px; text-align: center; }
+.zeit .tag { display: block; font-size: 12px; color: var(--nebel); }
+.zeit .uhr { display: block; font: 700 19px/1.1 var(--display); }
+.zeit .zu { display: block; font-size: 11px; color: var(--nebel); margin-top: 2px; }
+.zeit.fertig { opacity: .55; }
+.zeit.live { border-color: var(--flutlicht); background: rgba(255, 194, 71, .1); }
+.zeit.live .zu { color: var(--flutlicht); font-weight: 600; }
+
+.ich { margin: 14px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--tafel); display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.ich .wer { font-weight: 600; }
+.ich .was { font-size: 14px; color: var(--nebel); text-align: right; }
+
+.legende { display: flex; gap: 14px; margin: 18px 0 6px; font-size: 12px; color: var(--nebel); }
+.legende span { display: inline-flex; align-items: center; gap: 6px; }
+.legende i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* Rangliste */
+.liste { list-style: none; margin: 0; padding: 0; }
+.zeile { border-top: 1px solid var(--linie); }
+.zeile:last-child { border-bottom: 1px solid var(--linie); }
+.zeile.meins { background: linear-gradient(90deg, rgba(255,194,71,.10), rgba(255,194,71,0) 70%); }
+.kopfzeile { width: 100%; display: grid; grid-template-columns: 30px 1fr auto; column-gap: 10px; row-gap: 6px; padding: 12px 0; align-items: center; }
+.platz { font: 800 22px/1 var(--display); color: var(--nebel); text-align: left; }
+.zeile:nth-child(1) .platz { color: var(--flutlicht); }
+.name { font-weight: 600; font-size: 16px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.name small { font-weight: 500; color: var(--flutlicht); font-size: 12px; margin-left: 4px; }
+.punkte { font: 800 28px/1 var(--display); text-align: right; }
+.balken { grid-column: 2 / 4; display: flex; gap: 2px; height: 8px; }
+.balken span { display: block; height: 100%; border-radius: 2px; min-width: 0; }
+.balken .g { background: var(--gespielt); }
+.balken .l { background: var(--laeuft); }
+.balken .o { background: var(--offen); }
+.balken .leer { background: transparent; border: 1px dashed var(--linie); }
+.unterzeile { grid-column: 2 / 4; display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--nebel); }
+.unterzeile .rest { color: var(--kreide); }
+.unterzeile .live { color: var(--flutlicht); font-weight: 600; }
+.puls { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--flutlicht); margin-right: 5px; vertical-align: 1px; }
+@media (prefers-reduced-motion: no-preference) { .puls { animation: puls 1.6s ease-in-out infinite; } }
+@keyframes puls { 50% { opacity: .25; } }
+
+.details { padding: 0 0 14px 40px; }
+.gruppe { margin-top: 10px; }
+.gruppe h3 { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--nebel); }
+.gruppe h3 .live { color: var(--flutlicht); }
+.sp { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: center; padding: 5px 0; font-size: 14px; }
+.pos { font-size: 11px; font-weight: 600; color: var(--nebel); border: 1px solid var(--linie); border-radius: 4px; text-align: center; padding: 1px 0; }
+.sp .n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp .n em { font-style: normal; color: var(--nebel); font-size: 12px; margin-left: 6px; }
+.k { display: inline-block; font-size: 11px; font-weight: 700; color: var(--nacht); background: var(--flutlicht); border-radius: 3px; padding: 0 4px; margin-left: 6px; vertical-align: 1px; }
+.sp .p { font: 700 18px/1 var(--display); text-align: right; min-width: 48px; }
+.sp.live .p { color: var(--flutlicht); }
+.sp.offen .p { font: 500 13px/1 var(--text); color: var(--nebel); }
+.ichbin { margin-top: 12px; font-size: 13px; color: var(--flutlicht); border: 1px solid var(--linie); border-radius: 999px; padding: 6px 12px; }
+
+/* Strafen */
+.kasse { padding: 22px 0 4px; }
+.kasse .betrag { font: 800 64px/0.9 var(--display); }
+.kasse p { margin: 8px 0 0; color: var(--nebel); font-size: 15px; }
+.tarif { display: flex; gap: 6px 14px; flex-wrap: wrap; margin: 16px 0 18px; font-size: 13px; color: var(--nebel); }
+.tarif > span { display: inline-flex; align-items: center; gap: 6px; }
+.karte { display: inline-grid; place-items: center; width: 22px; height: 30px; border-radius: 3px; font: 800 13px/1 var(--display); color: #2A1A00; background: var(--gelb); transform: rotate(-6deg); flex: none; }
+.karte.rot { background: var(--rot); color: #fff; }
+.karte.klein { width: 14px; height: 19px; font-size: 0; transform: rotate(-6deg); border-radius: 2px; }
+.strafzeile { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid var(--linie); }
+.strafzeile:last-child { border-bottom: 1px solid var(--linie); }
+.strafzeile.meins { background: linear-gradient(90deg, rgba(255,194,71,.10), rgba(255,194,71,0) 70%); }
+.strafzeile .karten { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 5px; }
+.strafzeile .euro { font: 800 26px/1 var(--display); text-align: right; }
+.strafzeile .euro.null { color: var(--gruen); }
+.strafzeile .info { font-size: 12px; color: var(--nebel); margin-top: 3px; }
+h2 { font: 800 26px/1.1 var(--display); margin: 28px 0 10px; }
+.tag-block { border-top: 1px solid var(--linie); }
+.tag-block:last-child { border-bottom: 1px solid var(--linie); }
+.tag-block > button { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; font-weight: 600; }
+.tag-block > button .leise { font-weight: 400; font-size: 14px; }
+.tag-block ol { list-style: none; margin: 0 0 12px; padding: 0; }
+.tag-block li { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; font-size: 15px; }
+.tag-block li .pk { color: var(--nebel); font-size: 14px; }
+.pfeil { transition: transform .2s; width: 16px; height: 16px; flex: none; }
+[aria-expanded="true"] .pfeil { transform: rotate(180deg); }
+
+/* Saison */
+.chart-box { margin: 18px 0 6px; position: relative; }
+.chart-box svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.chart-titel { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.chart-titel h2 { margin-top: 22px; }
+.chart-titel .leise { font-size: 13px; }
+.tip { position: absolute; top: 4px; pointer-events: none; background: var(--tafel-hoch); border: 1px solid var(--linie); border-radius: 8px; padding: 8px 10px; font-size: 13px; line-height: 1.35; min-width: 140px; }
+.tip b { font-family: var(--display); font-size: 18px; }
+table.saison { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; }
+table.saison th { font-weight: 500; color: var(--nebel); font-size: 12px; text-align: right; padding: 6px 4px; border-bottom: 1px solid var(--linie); }
+table.saison th:nth-child(2), table.saison td:nth-child(2) { text-align: left; }
+table.saison td { padding: 10px 4px; text-align: right; border-bottom: 1px solid var(--linie); }
+table.saison td:first-child { font: 800 18px/1 var(--display); color: var(--nebel); text-align: left; width: 26px; }
+table.saison td.gesamt { font: 800 20px/1 var(--display); }
+table.saison tr { cursor: pointer; }
+table.saison tr.gewaehlt td { background: rgba(255,194,71,.08); }
+table.saison tr.gewaehlt td:nth-child(2) { color: var(--flutlicht); font-weight: 600; }
+table.saison td:nth-child(2) { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Statistik: Kopf, Zeitraum, Chips */
+.statzeile { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.zeitraum { display: inline-flex; flex: none; border: 1px solid var(--linie); border-radius: 8px; overflow: hidden; font-size: 13px; margin-bottom: 4px; }
+.zeitraum button { padding: 6px 10px; color: var(--nebel); font-weight: 500; }
+.zeitraum button[aria-pressed="true"] { background: var(--tafel-hoch); color: var(--kreide); }
+.chips { position: relative; display: flex; gap: 6px; overflow-x: auto; margin: 16px calc(-1 * var(--rand)) 0; padding: 0 var(--rand) 2px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; font-size: 14px; font-weight: 600; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--linie); color: var(--nebel); }
+.chip[aria-pressed="true"] { background: var(--kreide); border-color: var(--kreide); color: var(--nacht); }
+.erklaer { font-size: 13px; color: var(--nebel); margin: 12px 0 0; }
+.legende.dicht { margin: 10px 0 4px; }
+
+/* Statistik: Rangliste */
+.rz { border-top: 1px solid var(--linie); }
+.rz:last-child { border-bottom: 1px solid var(--linie); }
+.rz.meins { background: linear-gradient(90deg, rgba(255,194,71,.10), rgba(255,194,71,0) 70%); }
+.rang { width: 100%; display: grid; grid-template-columns: 30px 1fr auto; column-gap: 10px; row-gap: 6px; padding: 11px 0; align-items: center; }
+.rang .name em { font-style: normal; font-weight: 500; color: var(--nebel); font-size: 12px; margin-left: 6px; }
+.rang .wert { font: 800 24px/1 var(--display); text-align: right; white-space: nowrap; }
+.rang .wert small { font: 600 13px/1 var(--text); color: var(--nebel); margin-left: 1px; }
+.bar { grid-column: 2 / 4; display: flex; gap: 2px; height: 6px; }
+.bar span { display: block; height: 100%; border-radius: 2px; min-width: 2px; background: var(--offen); }
+.bar .tor { background: var(--laeuft); }
+.bar .vor { background: var(--offen); }
+.rang .sub { grid-column: 2 / 4; font-size: 13px; color: var(--nebel); display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
+.du { color: var(--flutlicht); font-weight: 600; }
+.mehr { display: block; width: 100%; text-align: center; padding: 14px 0; color: var(--flutlicht); font-weight: 600; font-size: 15px; }
+.aufzu { padding: 0 0 14px 40px; font-size: 14px; }
+.aufzu h3 { margin: 6px 0 6px; font-size: 12px; font-weight: 600; color: var(--nebel); }
+.tage { display: flex; flex-wrap: wrap; gap: 6px; }
+.tage span { border: 1px solid var(--linie); border-radius: 6px; padding: 4px 7px; font-size: 12px; color: var(--nebel); line-height: 1.2; }
+.tage b { display: block; font: 700 16px/1.1 var(--display); color: var(--kreide); }
+.wer { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 14px; }
+.wer li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; break-inside: avoid; }
+.wer li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wer li span:last-child { color: var(--nebel); }
+
+/* Statistik: Spielfeld */
+.feld { position: relative; margin: 16px 0 4px; border-radius: 12px; border: 1px solid var(--linie); padding: 26px 4px 14px;
+  background: linear-gradient(180deg, #182760 0%, #13204F 100%); display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+.feld .linien { position: absolute; inset: 0; width: 100%; height: 100%; }
+.feld .linien * { fill: none; stroke: rgba(243, 240, 232, .13); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.feld .formation { position: absolute; top: 8px; left: 12px; font: 700 15px/1 var(--display); color: var(--nebel); letter-spacing: .04em; }
+.feld .feldinfo { position: absolute; top: 9px; right: 12px; font-size: 11px; color: var(--nebel); }
+.reihe { position: relative; display: flex; justify-content: space-evenly; }
+.fs { flex: 0 1 76px; min-width: 0; text-align: center; padding: 0 2px; }
+.trikot { display: grid; place-items: center; width: 38px; height: 38px; margin: 0 auto 5px; border-radius: 50%;
+  background: var(--kreide); color: var(--nacht); font: 800 16px/1 var(--display); box-shadow: 0 0 0 3px rgba(14, 23, 51, .55); }
+.fs.kap .trikot { background: var(--flutlicht); }
+.fs .nm { display: block; font-size: 12px; font-weight: 600; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fs .vr { display: block; font-size: 11px; color: var(--nebel); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Statistik: Profil */
+.zurueck { display: inline-flex; align-items: center; gap: 4px; margin-top: 16px; color: var(--flutlicht); font-weight: 600; font-size: 15px; padding: 4px 0; }
+.zurueck svg { width: 18px; height: 18px; transform: rotate(90deg); }
+.profilknopf { margin-top: 12px; font-size: 14px; color: var(--flutlicht); border: 1px solid var(--linie); border-radius: 999px; padding: 6px 12px; font-weight: 600; }
+.kacheln { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 16px 0 4px; }
+.kachel { background: var(--tafel); border-radius: 10px; padding: 10px 10px 9px; min-width: 0; }
+.kachel .w { font: 800 27px/1 var(--display); }
+.kachel .t { font-size: 12px; color: var(--kreide); margin-top: 4px; line-height: 1.2; }
+.kachel .vgl { font-size: 11px; color: var(--nebel); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.delta { font: 600 12px/1 var(--text); margin-left: 5px; vertical-align: 4px; white-space: nowrap; }
+.delta.plus { color: var(--gruen); }
+.delta.minus { color: var(--rot); }
+.spur.rest span { background: var(--gespielt); }
+.spur-z { display: grid; grid-template-columns: 40px 1fr 56px; gap: 10px; align-items: center; padding: 7px 0; font-size: 14px; }
+.spur-z.breit { grid-template-columns: 92px 1fr 34px; }
+.spur-z .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spur { position: relative; height: 8px; border-radius: 2px; background: rgba(38, 53, 106, .7); }
+.spur span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--offen); }
+.spur i { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--kreide); }
+.spur-z .zahl { text-align: right; font-weight: 700; font-size: 18px; }
+.ez { display: grid; grid-template-columns: 42px 1fr auto; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid var(--linie); font-size: 14px; }
+.ez:last-child { border-bottom: 1px solid var(--linie); }
+.ez .d { font-size: 12px; color: var(--nebel); }
+.ez .n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.ez .n em { font-style: normal; font-weight: 400; color: var(--nebel); font-size: 12px; margin-left: 6px; }
+.ez .p { font: 700 19px/1 var(--display); text-align: right; }
+.karten-zeile { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--nebel); margin: 14px 0 0; }
+.karten-zeile span { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Hinweise */
+.hinweis { margin: 28px 0; padding: 16px; border: 1px dashed var(--linie); border-radius: 10px; color: var(--nebel); font-size: 15px; }
+.hinweis strong { color: var(--kreide); display: block; margin-bottom: 4px; font-size: 16px; }
+.hinweis button { margin-top: 10px; color: var(--flutlicht); font-weight: 600; }
+.fuss { font-size: 12px; color: var(--nebel); text-align: center; padding: 22px 0 10px; }
+
+/* Navigation */
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: rgba(22, 34, 74, .96); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--linie); padding-bottom: env(safe-area-inset-bottom); }
+nav.tabs .wrap { display: grid; grid-template-columns: repeat(5, 1fr); height: 64px; padding: 0 4px; }
+nav.tabs button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11.5px; font-weight: 500; color: var(--nebel); min-width: 0; }
+nav.tabs button svg { width: 22px; height: 22px; }
+nav.tabs button[aria-selected="true"] { color: var(--kreide); }
+nav.tabs button[aria-selected="true"] svg { color: var(--flutlicht); }
+section[hidden] { display: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<header class="kopf">
+  <div class="wrap">
+    <div class="liga">Männer Kickbase</div>
+    <button class="stand" id="stand" aria-label="Jetzt aktualisieren">
+      <span id="standText">lädt</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="v-live" aria-label="Live"><p class="hinweis" style="border:0">Daten werden geladen …</p></section>
+  <section id="v-strafen" aria-label="Strafen" hidden></section>
+  <section id="v-saison" aria-label="Saison" hidden></section>
+  <section id="v-spieler" aria-label="Spieler" hidden></section>
+  <section id="v-manager" aria-label="Manager" hidden></section>
+  <p class="fuss" id="fuss"></p>
+</main>
+
+<nav class="tabs" aria-label="Bereiche">
+  <div class="wrap" role="tablist">
+    <button role="tab" data-v="live" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2h5"/></svg>
+      Live
+    </button>
+    <button role="tab" data-v="strafen" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="11" height="16" rx="1.5" transform="rotate(-8 11.5 11)"/></svg>
+      Strafen
+    </button>
+    <button role="tab" data-v="saison" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>
+      Saison
+    </button>
+    <button role="tab" data-v="spieler" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 3.5 3 6.5l2 4.2 2.5-1.2V20.5h9V9.5l2.5 1.2 2-4.2-5.5-3c-.6 1.6-1.9 2.5-3.5 2.5S9.1 5.1 8.5 3.5z"/></svg>
+      Spieler
+    </button>
+    <button role="tab" data-v="manager" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.6-3.9 3.7-6.5 7.5-6.5s6.9 2.6 7.5 6.5"/></svg>
+      Manager
+    </button>
+  </div>
+</nav>
+
+<script>
+(function () {
+  "use strict";
+  const API = (window.KB_API || "").trim();
+  const NF = new Intl.NumberFormat("de-DE");
+  const NF1 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const EUR = v => (Math.round(v * 100) / 100).toLocaleString("de-DE", { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
+  const SVG_PFEIL = '<svg class="pfeil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const FUHR = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", hour: "2-digit", minute: "2-digit" });
+  const FTAG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "short" });
+  const uhr = t => FUHR.format(new Date(t));
+  const tag = t => FTAG.format(new Date(t)).replace(".", "");
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* privat */ } },
+  };
+
+  let D = null;                 // letzte Daten
+  let ladezeit = 0;
+  let offen = new Set();        // aufgeklappte Manager
+  let offenTage = null;         // null = nur der neueste Spieltag aufgeklappt
+  let ich = store.get("kb_ich");
+  let gewaehlt = null;          // Manager im Saison-Diagramm
+  let ansicht = store.get("kb_ansicht") || "live";
+
+  // ------------------------------------------------------------ Laden
+  function jsonp(url) {
+    return new Promise((ok, fehler) => {
+      const cb = "kbCb" + Math.random().toString(36).slice(2, 8);
+      const s = document.createElement("script");
+      const t = setTimeout(() => { aufraeumen(); fehler(new Error("Zeitüberschreitung")); }, 15000);
+      function aufraeumen() { clearTimeout(t); delete window[cb]; s.remove(); }
+      window[cb] = d => { aufraeumen(); ok(d); };
+      s.onerror = () => { aufraeumen(); fehler(new Error("Netzwerkfehler")); };
+      s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb + "&t=" + Date.now();
+      document.head.appendChild(s);
+    });
+  }
+  async function holen() {
+    try {
+      const r = await fetch(API + (API.includes("?") ? "&" : "?") + "t=" + Date.now(), { redirect: "follow" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return await r.json();
+    } catch (e) {
+      return jsonp(API);
+    }
+  }
+  async function laden() {
+    if (!API) { zeigeEinrichtung(); return; }
+    const knopf = document.getElementById("stand");
+    knopf.classList.add("laedt");
+    try {
+      const d = await holen();
+      if (!d || d.ok === false) throw new Error((d && d.fehler) || "Keine Daten");
+      D = d; ladezeit = Date.now();
+      store.set("kb_daten", JSON.stringify(d));   // beim nächsten Öffnen sofort sichtbar
+      rendern();
+      historieLaden();                            // nur wenn sich die Statistik-Version geändert hat
+    } catch (e) {
+      if (!D) zeigeFehler(e.message);
+      document.getElementById("standText").textContent = "offline";
+    } finally {
+      knopf.classList.remove("laedt");
+    }
+  }
+
+  // ------------------------------------------------------------ Berechnungen
+  function status(sp, jetzt) {
+    if (!sp.anstoss) return "offen";
+    if (jetzt < sp.anstoss) return "offen";
+    if (jetzt < sp.anstoss + D.spieldauer * 60000) return "live";
+    return "fertig";
+  }
+  function auswerten(jetzt) {
+    const ms = D.manager.map(m => {
+      const s = { g: 0, l: 0, o: 0, nL: 0, nO: 0 };
+      m.spieler.forEach(sp => {
+        const st = status(sp, jetzt);
+        const p = sp.preis || 0;
+        if (st === "fertig") s.g += p; else if (st === "live") { s.l += p; s.nL++; } else { s.o += p; s.nO++; }
+      });
+      return Object.assign({}, m, s, { summe: s.g + s.l + s.o });
+    });
+    ms.sort((a, b) => b.punkte - a.punkte || a.name.localeCompare(b.name, "de"));
+    let platz = 0, vorher = null;
+    ms.forEach((m, i) => { if (m.punkte !== vorher) { platz = i + 1; vorher = m.punkte; } m.platz = platz; });
+    return ms;
+  }
+  function anstossZeiten() {
+    const z = new Set();
+    D.manager.forEach(m => m.spieler.forEach(sp => sp.anstoss && z.add(sp.anstoss)));
+    return [...z].sort((a, b) => a - b);
+  }
+
+  // ------------------------------------------------------------ Live
+  function renderLive() {
+    const el = document.getElementById("v-live");
+    const jetzt = Date.now();
+    if (!D.manager.length) {
+      el.innerHTML = '<div class="held"><h1>Spieltag ' + esc(D.spieltag || "") + '</h1></div>' +
+        '<div class="hinweis"><strong>Noch keine Aufstellungen</strong>Sie erscheinen hier kurz nach dem ersten Anpfiff des Spieltags.</div>';
+      return;
+    }
+    const ms = auswerten(jetzt);
+    const zeiten = anstossZeiten();
+    const dauer = D.spieldauer * 60000;
+    const nLive = zeiten.filter(t => jetzt >= t && jetzt < t + dauer).length;
+    const nFertig = zeiten.filter(t => jetzt >= t + dauer).length;
+    let lage;
+    if (nFertig === zeiten.length) lage = "Spieltag beendet.";
+    else if (nLive) lage = "<b>Läuft gerade.</b> " + nFertig + " von " + zeiten.length + " Anstoßzeiten abgeschlossen.";
+    else if (nFertig === 0) lage = "Beginnt " + tag(zeiten[0]) + " " + uhr(zeiten[0]) + ".";
+    else { const n = zeiten.find(t => t > jetzt); lage = "Weiter geht es " + tag(n) + " " + uhr(n) + "."; }
+    const max = Math.max(D.budget, ...ms.map(m => m.summe));
+    const ichM = ms.find(m => m.id === ich);
+
+    let h = '<div class="held"><h1>Spieltag ' + esc(D.spieltag || "") + '</h1><p class="lage">' + lage + '</p>';
+    h += '<div class="zeiten" role="list">' + zeiten.map(t => {
+      const st = jetzt >= t + dauer ? "fertig" : jetzt >= t ? "live" : "kommt";
+      const zu = st === "fertig" ? "fertig" : st === "live" ? '<span class="puls"></span>live' : "";
+      return '<div class="zeit ' + st + '" role="listitem"><span class="tag">' + tag(t) + '</span><span class="uhr">' + uhr(t) + '</span><span class="zu">' + (zu || "&nbsp;") + '</span></div>';
+    }).join("") + '</div>';
+    if (ichM) {
+      h += '<div class="ich"><span class="wer">Platz ' + ichM.platz + ' von ' + ms.length + '</span><span class="was">' +
+        NF.format(ichM.punkte) + ' Punkte, noch ' + NF1.format(ichM.l + ichM.o) + ' Mio im Spiel</span></div>';
+    }
+    h += '</div>';
+    h += '<div class="legende" aria-hidden="true"><span><i style="background:var(--gespielt)"></i>gespielt</span><span><i style="background:var(--laeuft)"></i>läuft</span><span><i style="background:var(--offen)"></i>noch offen</span></div>';
+    h += '<ol class="liste">';
+    const fuehrer = ms[0].punkte;
+    ms.forEach(m => {
+      const auf = offen.has(m.id);
+      const w = v => (v / max * 100).toFixed(2) + "%";
+      const leer = Math.max(0, max - m.summe);
+      let unten = m.nL || m.nO
+        ? (m.nL ? '<span class="live"><span class="puls"></span>' + m.nL + " läuft</span>" : "") + (m.nL && m.nO ? ", " : "") + (m.nO ? m.nO + " offen" : "")
+        : "alle durch";
+      const rest = m.l + m.o;
+      h += '<li class="zeile' + (m.id === ich ? " meins" : "") + '">' +
+        '<button class="kopfzeile" aria-expanded="' + auf + '" data-m="' + esc(m.id) + '">' +
+        '<span class="platz">' + m.platz + '</span>' +
+        '<span class="name">' + esc(m.name) + (m.id === ich ? "<small>du</small>" : "") + '</span>' +
+        '<span class="punkte zahl">' + NF.format(m.punkte) + '</span>' +
+        '<span class="balken" role="img" aria-label="' + NF1.format(m.g) + ' Mio gespielt, ' + NF1.format(m.l) + ' Mio laufen, ' + NF1.format(m.o) + ' Mio offen">' +
+          (m.g ? '<span class="g" style="width:' + w(m.g) + '"></span>' : "") +
+          (m.l ? '<span class="l" style="width:' + w(m.l) + '"></span>' : "") +
+          (m.o ? '<span class="o" style="width:' + w(m.o) + '"></span>' : "") +
+          (leer > 0.05 ? '<span class="leer" style="width:' + w(leer) + '"></span>' : "") + '</span>' +
+        '<span class="unterzeile"><span>' + (rest > 0 ? '<span class="rest">noch ' + NF1.format(rest) + ' Mio</span>, ' : "") + unten +
+          (m.kap ? ', K: ' + esc(m.kap) : "") + '</span><span>' + (m.punkte < fuehrer ? "−" + NF.format(fuehrer - m.punkte) : "") + '</span></span>' +
+        '</button>' + (auf ? details(m, jetzt) : "") + '</li>';
+    });
+    h += '</ol>';
+    el.innerHTML = h;
+  }
+  function details(m, jetzt) {
+    const gruppen = new Map();
+    m.spieler.slice().sort((a, b) => (a.anstoss || 9e15) - (b.anstoss || 9e15) || posNr(a.pos) - posNr(b.pos))
+      .forEach(sp => { const k = sp.anstoss || 0; if (!gruppen.has(k)) gruppen.set(k, []); gruppen.get(k).push(sp); });
+    let h = '<div class="details">';
+    gruppen.forEach((liste, t) => {
+      const st = t ? status(liste[0], jetzt) : "offen";
+      const titel = t ? tag(t) + " " + uhr(t) : "ohne Termin";
+      h += '<div class="gruppe"><h3>' + titel + ', ' + (st === "live" ? '<span class="live">läuft</span>' : st) + '</h3>';
+      liste.forEach(sp => {
+        const s = status(sp, jetzt);
+        const p = s === "offen" ? NF1.format(sp.preis || 0) + " Mio" : NF.format(sp.punkte || 0);
+        h += '<div class="sp ' + s + '"><span class="pos">' + esc(sp.pos) + '</span><span class="n">' + esc(sp.n) +
+          (sp.k ? '<span class="k" title="Kapitän, zählt doppelt">×2</span>' : "") +
+          '<em>' + esc(sp.verein) + (sp.gegner ? " gegen " + esc(sp.gegner) + (sp.ort ? " (" + esc(sp.ort) + ")" : "") : "") + '</em></span>' +
+          '<span class="p">' + p + '</span></div>';
+      });
+      h += '</div>';
+    });
+    h += '<button class="ichbin" data-ich="' + esc(m.id) + '">' + (m.id === ich ? "Markierung entfernen" : "Das bin ich") + '</button>' +
+      (H && H.manager && H.manager[m.id] ? ' <button class="ichbin" data-profil="' + esc(m.id) + '">Saison-Profil ›</button>' : "") + '</div>';
+    return h;
+  }
+  const posNr = p => ({ TW: 1, ABW: 2, MF: 3, ST: 4 }[p] || 9);
+
+  // ------------------------------------------------------------ Strafen
+  function strafenAuswerten() {
+    const s = {};
+    const tage = (D.strafen && D.strafen.tage) || [];
+    tage.forEach(t => t.liste.forEach(e => {
+      const x = s[e.id] = s[e.id] || { id: e.id, name: e.name, summe: 0, karten: [], letzter: 0 };
+      x.name = e.name;
+      if (e.betrag > 0) { x.summe += e.betrag; x.karten.push({ d: t.d, b: e.betrag, letzter: e.platzVonUnten === 1 }); }
+      if (e.platzVonUnten === 1) x.letzter++;
+    }));
+    const liste = Object.values(s).sort((a, b) => b.summe - a.summe || b.letzter - a.letzter || a.name.localeCompare(b.name, "de"));
+    return { liste, tage, kasse: liste.reduce((a, x) => a + x.summe, 0) };
+  }
+  function renderStrafen() {
+    const el = document.getElementById("v-strafen");
+    const S = strafenAuswerten();
+    const b = (D.strafen && D.strafen.betraege) || [10, 8, 5, 3];
+    if (!S.tage.length) { el.innerHTML = '<div class="hinweis"><strong>Noch keine Strafen</strong>Abgerechnet wird montags um 18:30 nach jedem Spieltag.</div>'; return; }
+    let h = '<div class="kasse"><div class="betrag zahl">' + EUR(S.kasse) + '</div><p>in der Kasse nach ' + S.tage.length + (S.tage.length === 1 ? " Spieltag" : " Spieltagen") + '</p></div>';
+    h += '<div class="tarif">' + b.map((x, i) => '<span><span class="karte' + (i === 0 ? " rot" : "") + '">' + x + '</span>' +
+      ["Letzter", "Vorletzter", "3.-Letzter", "4.-Letzter"][i] + '</span>').join("") + '</div>';
+    h += '<div>' + S.liste.map((x, i) =>
+      '<div class="strafzeile' + (x.id === ich ? " meins" : "") + '"><span class="platz">' + (i + 1) + '</span><div><div class="name">' + esc(x.name) + (x.id === ich ? "<small>du</small>" : "") + '</div>' +
+      (x.karten.length ? '<div class="karten">' + x.karten.map(k => '<span class="karte klein' + (k.letzter ? " rot" : "") + '" title="Spieltag ' + k.d + ': ' + EUR(k.b) + '"></span>').join("") + '</div>' +
+        '<div class="info">' + x.karten.length + "× gezahlt" + (x.letzter ? ", " + x.letzter + "× Letzter" : "") + '</div>' : '<div class="info">bisher straffrei</div>') +
+      '</div><span class="euro zahl' + (x.summe ? "" : " null") + '">' + EUR(x.summe) + '</span></div>').join("") + '</div>';
+    h += '<h2>Spieltage</h2>';
+    S.tage.slice().reverse().forEach((t, i) => {
+      const auf = offenTage ? offenTage.has(t.d) : i === 0;
+      const zahler = t.liste.filter(e => e.betrag > 0);
+      h += '<div class="tag-block"><button data-tag="' + t.d + '" aria-expanded="' + auf + '"><span>Spieltag ' + t.d +
+        ' <span class="leise">' + EUR(zahler.reduce((a, e) => a + e.betrag, 0)) + '</span></span>' + SVG_PFEIL + '</button>';
+      if (auf) h += '<ol>' + zahler.map(e => '<li><span class="karte' + (e.platzVonUnten === 1 ? " rot" : "") + '">' + NF.format(e.betrag) + '</span><span class="name">' + esc(e.name) +
+        '</span><span class="pk">' + NF.format(e.pkt) + ' Pkt.</span></li>').join("") + '</ol>';
+      h += '</div>';
+    });
+    el.innerHTML = h;
+  }
+
+  // ------------------------------------------------------------ Saison
+  function saisonAuswerten() {
+    const rows = D.saison || [];
+    const tage = [...new Set(rows.map(r => r.d))].sort((a, b) => a - b);
+    const m = {};
+    rows.forEach(r => { const x = m[r.id] = m[r.id] || { id: r.id, name: r.name, je: {} }; x.je[r.d] = r.pkt; x.name = r.name; });
+    const sieger = {}, schnitt = {};
+    tage.forEach(d => {
+      const werte = Object.values(m).filter(x => d in x.je).map(x => x.je[d]);
+      const top = Math.max(...werte);
+      schnitt[d] = werte.reduce((a, v) => a + v, 0) / werte.length;
+      Object.values(m).forEach(x => { if (x.je[d] === top) sieger[x.id] = (sieger[x.id] || 0) + 1; });
+    });
+    const liste = Object.values(m).map(x => {
+      const w = tage.filter(d => d in x.je).map(d => x.je[d]);
+      const best = Math.max(...w);
+      return Object.assign(x, { gesamt: w.reduce((a, v) => a + v, 0), schnitt: w.length ? w.reduce((a, v) => a + v, 0) / w.length : 0,
+        siege: sieger[x.id] || 0, best: best, bestTag: tage.find(d => x.je[d] === best) });
+    }).sort((a, b) => b.gesamt - a.gesamt);
+    return { tage, liste, schnitt };
+  }
+  function renderSaison() {
+    const el = document.getElementById("v-saison");
+    const S = saisonAuswerten();
+    if (!S.tage.length) { el.innerHTML = '<div class="hinweis"><strong>Noch keine fertigen Spieltage</strong>Die Statistik füllt sich nach dem ersten abgerechneten Spieltag.</div>'; return; }
+    if (!gewaehlt || !S.liste.some(x => x.id === gewaehlt)) gewaehlt = S.liste.some(x => x.id === ich) ? ich : S.liste[0].id;
+    const g = S.liste.find(x => x.id === gewaehlt);
+    let h = '<div class="chart-titel"><h2>Punkte je Spieltag</h2><span class="leise">Antippen zeigt Werte</span></div>';
+    h += '<div class="chart-box" id="chart">' + chartSvg(S, g) + '<div class="tip" id="tip" hidden></div></div>';
+    h += '<div class="legende"><span><i style="background:var(--flutlicht)"></i>' + esc(g.name) + '</span><span><i style="background:var(--nebel);height:2px"></i>Schnitt der Liga</span><span><i style="background:var(--gespielt);height:2px"></i>alle anderen</span></div>';
+    h += '<h2>Gesamtwertung</h2><table class="saison"><thead><tr><th></th><th>Manager</th><th>Gesamt</th><th>Ø</th><th>Siege</th><th>Bester</th></tr></thead><tbody>' +
+      S.liste.map((x, i) => '<tr data-g="' + esc(x.id) + '" class="' + (x.id === gewaehlt ? "gewaehlt" : "") + '"><td>' + (i + 1) + '</td><td>' + esc(x.name) +
+        '</td><td class="gesamt">' + NF.format(x.gesamt) + '</td><td>' + NF.format(Math.round(x.schnitt)) + '</td><td>' + x.siege + '</td><td>' + NF.format(x.best) + '</td></tr>').join("") +
+      '</tbody></table><p class="leise" style="font-size:13px">Abgerechnete Spieltage 1 bis ' + S.tage[S.tage.length - 1] + '. Zeile antippen, um den Manager im Diagramm hervorzuheben.</p>';
+    el.innerHTML = h;
+    chartTouch(S, g);
+  }
+  const CH = { w: 360, h: 220, l: 40, r: 12, t: 12, b: 26 };
+  function skalen(S) {
+    const alle = S.liste.flatMap(x => S.tage.filter(d => d in x.je).map(d => x.je[d]));
+    let lo = Math.min(...alle), hi = Math.max(...alle);
+    const schritt = hi - lo > 1500 ? 500 : 250;
+    lo = Math.floor(lo / schritt) * schritt; hi = Math.ceil(hi / schritt) * schritt;
+    const x = d => S.tage.length === 1 ? (CH.l + CH.w - CH.r) / 2 : CH.l + (S.tage.indexOf(d) / (S.tage.length - 1)) * (CH.w - CH.l - CH.r);
+    const y = v => CH.t + (1 - (v - lo) / (hi - lo || 1)) * (CH.h - CH.t - CH.b);
+    return { x, y, lo, hi, schritt };
+  }
+  function pfad(S, sk, je) {
+    return S.tage.filter(d => d in je).map((d, i) => (i ? "L" : "M") + sk.x(d).toFixed(1) + " " + sk.y(je[d]).toFixed(1)).join(" ");
+  }
+  function chartSvg(S, g) {
+    const sk = skalen(S);
+    let s = '<svg viewBox="0 0 ' + CH.w + ' ' + CH.h + '" role="img" aria-label="Punkte je Spieltag, ' + esc(g.name) + ' hervorgehoben">';
+    for (let v = sk.lo; v <= sk.hi; v += sk.schritt) {
+      s += '<line x1="' + CH.l + '" x2="' + (CH.w - CH.r) + '" y1="' + sk.y(v) + '" y2="' + sk.y(v) + '" stroke="#26356A" stroke-width="1"/>' +
+        '<text x="' + (CH.l - 6) + '" y="' + (sk.y(v) + 4) + '" text-anchor="end" fill="#A9B3CF" font-size="11" font-family="Barlow">' + NF.format(v) + '</text>';
+    }
+    S.tage.forEach(d => { s += '<text x="' + sk.x(d) + '" y="' + (CH.h - 8) + '" text-anchor="middle" fill="#A9B3CF" font-size="11" font-family="Barlow">' + d + '</text>'; });
+    S.liste.filter(x => x.id !== g.id).forEach(x => { s += '<path d="' + pfad(S, sk, x.je) + '" fill="none" stroke="#36446E" stroke-width="1.25" stroke-linejoin="round"/>'; });
+    s += '<path d="' + pfad(S, sk, S.schnitt) + '" fill="none" stroke="#A9B3CF" stroke-width="1.5" stroke-dasharray="4 4"/>';
+    s += '<path d="' + pfad(S, sk, g.je) + '" fill="none" stroke="#FFC247" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+    S.tage.filter(d => d in g.je).forEach(d => { s += '<circle cx="' + sk.x(d) + '" cy="' + sk.y(g.je[d]) + '" r="4" fill="#FFC247" stroke="#0E1733" stroke-width="2"/>'; });
+    s += '<line id="fadenkreuz" x1="0" x2="0" y1="' + CH.t + '" y2="' + (CH.h - CH.b) + '" stroke="#F3F0E8" stroke-opacity=".5" stroke-width="1" visibility="hidden"/>';
+    s += '<rect x="' + CH.l + '" y="0" width="' + (CH.w - CH.l - CH.r) + '" height="' + CH.h + '" fill="transparent" id="flaeche"/></svg>';
+    return s;
+  }
+  function chartTouch(S, g) {
+    const box = document.getElementById("chart");
+    const svg = box.querySelector("svg"), tip = document.getElementById("tip"), fk = svg.querySelector("#fadenkreuz");
+    const sk = skalen(S);
+    function zeig(ev) {
+      const r = svg.getBoundingClientRect();
+      const px = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left) / r.width * CH.w;
+      let d = S.tage[0], best = 1e9;
+      S.tage.forEach(t => { const a = Math.abs(sk.x(t) - px); if (a < best) { best = a; d = t; } });
+      const werte = S.liste.filter(x => d in x.je).map(x => x.je[d]).sort((a, b) => b - a);
+      const v = g.je[d];
+      const platz = v == null ? null : werte.indexOf(v) + 1;
+      fk.setAttribute("x1", sk.x(d)); fk.setAttribute("x2", sk.x(d)); fk.setAttribute("visibility", "visible");
+      tip.hidden = false;
+      tip.innerHTML = 'Spieltag ' + d + '<br><b>' + (v == null ? "–" : NF.format(v)) + '</b> ' + esc(g.name) + (platz ? ', Platz ' + platz : "") +
+        '<br><span class="leise">Schnitt ' + NF.format(Math.round(S.schnitt[d])) + ', bester ' + NF.format(werte[0]) + '</span>';
+      const links = sk.x(d) / CH.w * r.width;
+      tip.style.left = Math.min(Math.max(0, links - 80), r.width - tip.offsetWidth) + "px";
+    }
+    svg.addEventListener("pointerdown", zeig); svg.addEventListener("pointermove", e => { if (e.pointerType === "mouse" || e.buttons) zeig(e); });
+    const weg = () => { tip.hidden = true; fk.setAttribute("visibility", "hidden"); };
+    svg.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") weg(); });   // Touch: bleibt stehen
+    tipWeg = weg;
+  }
+
+  // ------------------------------------------------------------ Statistik-Daten (Historie)
+  // Zeile z: [Spieltag, Manager, Spieler, Punkte, Tore, Vorlagen, Kapitän, Startelf, Minuten, Zu null, Gelb, Rot, Preis]
+  let H = null, hLaedt = false, hFehler = null, statKey = "", statVal = null;
+  const SX = {
+    sp: store.get("kb_sp") || "beliebt", mg: store.get("kb_mg") || "scorer", zeit: store.get("kb_zeit") || "saison",
+    alle: false, auf: null, profil: null,
+  };
+  const POS = ["TW", "ABW", "MF", "ST"];
+  const FORMATIONEN = ["4-4-2", "4-3-3", "3-4-3", "3-5-2", "4-5-1", "5-3-2", "5-4-1", "3-6-1", "4-2-4", "5-2-3"];
+  const MIN_TAGE = () => SX.zeit === "form" ? 2 : 3;
+
+  function hSetzen(h) {
+    const info = h.spieler || {};
+    h.rows = (h.z || []).map(r => {
+      const s = info[r[2]] || ["Unbekannt", "", ""];
+      return { d: r[0], m: String(r[1]), p: String(r[2]), pkt: r[3] || 0, t: r[4] || 0, v: r[5] || 0, k: r[6] ? 1 : 0, s: r[7], min: r[8],
+        zn: r[9] || 0, g: r[10] || 0, r: r[11] || 0, preis: r[12], name: s[0], pos: s[1], verein: s[2] || "–" };
+    });
+    H = h; statKey = "";
+  }
+  async function holeTeil(teil) {
+    const url = API + (API.includes("?") ? "&" : "?") + "teil=" + teil;
+    try {
+      const r = await fetch(url + "&t=" + Date.now(), { redirect: "follow" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return await r.json();
+    } catch (e) {
+      return jsonp(url);
+    }
+  }
+  async function historieLaden(erzwingen) {
+    const soll = D && D.historie;
+    if (!soll || !soll.zeilen || hLaedt) return;
+    if (!erzwingen && H && H.version === soll.version) return;
+    hLaedt = true; hFehler = null;
+    if (!H) renderStats();
+    try {
+      const h = await holeTeil("historie");
+      if (!h || h.ok === false) throw new Error((h && h.fehler) || "Keine Statistikdaten");
+      hSetzen(h);
+      store.set("kb_hist", JSON.stringify({ version: h.version, manager: h.manager, spieler: h.spieler, z: h.z }));
+    } catch (e) {
+      hFehler = e.message;
+    }
+    hLaedt = false;
+    renderStats();
+  }
+
+  function stat() {
+    const key = H.version + "|" + SX.zeit;
+    if (key === statKey) return statVal;
+    const namen = Object.assign({}, H.manager);
+    ((D && D.saison) || []).forEach(x => { namen[x.id] = x.name; });
+    ((D && D.manager) || []).forEach(x => { namen[x.id] = x.name; });
+    const alleTage = [...new Set(H.rows.map(r => r.d))].sort((a, b) => a - b);
+    const tage = SX.zeit === "form" ? alleTage.slice(-3) : alleTage;
+    const tset = new Set(tage);
+    const rows = H.rows.filter(r => tset.has(r.d));
+
+    const sd = new Map();          // ein Eintrag je Spieler und Spieltag
+    rows.forEach(r => {
+      const k = r.p + "|" + r.d;
+      let x = sd.get(k);
+      if (!x) sd.set(k, x = { r, wer: [], kap: 0 });
+      x.wer.push(r.m); if (r.k) x.kap++;
+    });
+
+    const sp = new Map();
+    sd.forEach(x => {
+      const r = x.r;
+      let s = sp.get(r.p);
+      if (!s) sp.set(r.p, s = { id: r.p, name: r.name, pos: r.pos, verein: r.verein, picks: 0, tage: 0, pkt: 0, t: 0, v: 0,
+        kap: 0, kapBonus: 0, best: -1e9, bestTag: 0, wer: new Map(), je: [] });
+      s.picks += x.wer.length; s.tage++; s.pkt += r.pkt; s.t += r.t; s.v += r.v; s.kap += x.kap; s.kapBonus += x.kap * r.pkt;
+      if (r.pkt > s.best) { s.best = r.pkt; s.bestTag = r.d; }
+      x.wer.forEach(m => s.wer.set(m, (s.wer.get(m) || 0) + 1));
+      s.je.push({ d: r.d, pkt: r.pkt, n: x.wer.length });
+    });
+    sp.forEach(s => s.je.sort((a, b) => a.d - b.d));
+
+    const mg = new Map();
+    rows.forEach(r => {
+      let m = mg.get(r.m);
+      if (!m) mg.set(r.m, m = { id: r.m, name: namen[r.m] || r.m, t: 0, v: 0, zn: 0, g: 0, r: 0, kapBonus: 0, kapBest: null,
+        exPkt: 0, exN: 0, exBest: null, pkt: 0, preis: 0, pktPreis: 0, preisTage: new Set(), picks: 0, tage: new Set(),
+        pos: { TW: 0, ABW: 0, MF: 0, ST: 0 }, vereine: new Map(), spieler: new Map(), kapJe: [], einzel: [] });
+      const eff = r.pkt * (r.k ? 2 : 1);
+      const e = { r, eff };
+      m.t += r.t; m.v += r.v; m.zn += r.zn; m.g += r.g; m.r += r.r; m.picks++; m.tage.add(r.d); m.pkt += eff;
+      if (r.k) { m.kapBonus += r.pkt; m.kapJe.push(e); if (!m.kapBest || r.pkt > m.kapBest.r.pkt) m.kapBest = e; }
+      if (sd.get(r.p + "|" + r.d).wer.length === 1) { m.exPkt += eff; m.exN++; if (!m.exBest || eff > m.exBest.eff) m.exBest = e; }
+      if (r.preis > 0) { m.preis += r.preis; m.pktPreis += eff; m.preisTage.add(r.d); }
+      if (r.pos in m.pos) m.pos[r.pos] += eff;
+      m.vereine.set(r.verein, (m.vereine.get(r.verein) || 0) + 1);
+      let ms = m.spieler.get(r.p);
+      if (!ms) m.spieler.set(r.p, ms = { id: r.p, name: r.name, pos: r.pos, verein: r.verein, n: 0, pkt: 0, kap: 0 });
+      ms.n++; ms.pkt += eff; ms.kap += r.k;
+      m.einzel.push(e);
+    });
+
+    const vr = new Map();
+    rows.forEach(r => {
+      let c = vr.get(r.verein);
+      if (!c) vr.set(r.verein, c = { id: r.verein, name: r.verein, picks: 0, pkt: 0, kap: 0, spieler: new Map() });
+      c.picks++; c.pkt += r.pkt; c.kap += r.k;
+      c.spieler.set(r.p, (c.spieler.get(r.p) || 0) + 1);
+    });
+
+    const saison = {};             // offizielle Spieltagspunkte im Zeitraum
+    ((D && D.saison) || []).forEach(x => {
+      if (!tset.has(x.d)) return;
+      const s = saison[x.id] = saison[x.id] || { sum: 0, n: 0, best: -1e9, bestTag: 0 };
+      s.sum += x.pkt; s.n++;
+      if (x.pkt > s.best) { s.best = x.pkt; s.bestTag = x.d; }
+    });
+
+    statVal = { tage, alleTage, rows, sd, sp: [...sp.values()], mg: [...mg.values()], vr: [...vr.values()], saison,
+      hatPreis: rows.some(r => r.preis > 0) };
+    statKey = key;
+    return statVal;
+  }
+
+  // ------------------------------------------------------------ Statistik-Bausteine
+  const hinweis = (titel, text) => '<div class="hinweis"><strong>' + titel + '</strong>' + text + '</div>';
+  function statLeer() {
+    if (!D) return '<p class="hinweis" style="border:0">Daten werden geladen …</p>';
+    if (!D.historie) return hinweis("Statistik noch nicht eingerichtet", "Den neuen Apps-Script-Code einfügen und unter Bereitstellungen eine neue Version der Web-App erstellen.");
+    if (!D.historie.zeilen) return hinweis("Noch keine Statistikdaten", "Im Google Sheet einmal Kickbase → 📊 Statistik-Daten nachladen ausführen. Danach kommen neue Spieltage jeden Montag automatisch dazu.");
+    if (!H) return hLaedt ? '<p class="hinweis" style="border:0">Statistik wird geladen …</p>'
+      : hinweis("Statistik konnte nicht geladen werden", esc(hFehler || "Unbekannter Fehler") + '.<br><button id="histNochmal">Erneut laden</button>');
+    return "";
+  }
+  function statKopf(titel, S) {
+    const von = S.tage[0], bis = S.tage[S.tage.length - 1];
+    const schalter = S.alleTage.length > 3
+      ? '<div class="zeitraum" role="group" aria-label="Zeitraum"><button data-zeit="saison" aria-pressed="' + (SX.zeit === "saison") +
+        '">Saison</button><button data-zeit="form" aria-pressed="' + (SX.zeit === "form") + '">Letzte 3</button></div>' : "";
+    return '<div class="held"><div class="statzeile"><h1>' + titel + '</h1>' + schalter + '</div><p class="lage">' +
+      (von === bis ? "Spieltag " + von : "Spieltag " + von + " bis " + bis) + ", " + NF.format(S.rows.length) + " Aufstellungsplätze ausgewertet</p></div>";
+  }
+  function chips(liste, aktiv, attr) {
+    return '<div class="chips" role="group" aria-label="Auswertung">' + liste.map(([k, t]) =>
+      '<button class="chip" data-' + attr + '="' + k + '" aria-pressed="' + (k === aktiv) + '">' + t + '</button>').join("") + '</div>';
+  }
+  // items: { id, titel, wert, n, teile: [{ v, c }], sub, meins, aufzu, attr }
+  function rangliste(items, mehrText) {
+    if (!items.length) return hinweis("Keine Daten", "Für diesen Zeitraum gibt es hier noch nichts auszuwerten.");
+    const summe = it => it.teile.reduce((a, x) => a + x.v, 0);
+    const max = Math.max(...items.map(summe)) || 1;
+    const zeig = SX.alle ? items : items.slice(0, 15);
+    let platz = 0, vorher = null;
+    let h = '<ol class="liste">';
+    zeig.forEach((it, i) => {
+      if (it.n !== vorher) { platz = i + 1; vorher = it.n; }
+      const auf = it.aufzu && SX.auf === it.attr + ":" + it.id;
+      h += '<li class="rz' + (it.meins ? " meins" : "") + '"><button class="rang" data-' + it.attr + '="' + esc(it.id) + '"' +
+        (it.aufzu ? ' aria-expanded="' + !!auf + '"' : "") + '><span class="platz">' + platz + '</span><span class="name">' + it.titel +
+        '</span><span class="wert zahl">' + it.wert + '</span><span class="bar" aria-hidden="true">' +
+        it.teile.filter(x => x.v > 0).map(x => '<span class="' + (x.c || "") + '" style="width:' + (x.v / max * 100).toFixed(2) + '%"></span>').join("") +
+        '</span><span class="sub">' + it.sub + '</span></button>' + (auf ? it.aufzu() : "") + '</li>';
+    });
+    h += '</ol>';
+    if (!SX.alle && items.length > 15) h += '<button class="mehr" data-mehr="1">Alle ' + items.length + ' ' + mehrText + ' zeigen</button>';
+    return h;
+  }
+  const spTitel = s => esc(s.name) + '<em>' + esc(s.pos) + ' · ' + esc(s.verein) + '</em>';
+  const duTag = s => { const n = ich && s.wer ? s.wer.get(ich) : 0; return n ? '<span class="du">bei dir ' + n + '×</span>' : ""; };
+  const NF0 = v => NF.format(Math.round(v));
+
+  function elf(liste, w) {
+    const nach = { TW: [], ABW: [], MF: [], ST: [] };
+    liste.forEach(x => { if (nach[x.pos]) nach[x.pos].push(x); });
+    Object.values(nach).forEach(a => a.sort((a, b) => w(b) - w(a) || (b.pkt || 0) - (a.pkt || 0)));
+    let best = null;
+    FORMATIONEN.forEach(f => {
+      const [a, mi, s] = f.split("-").map(Number);
+      if (!nach.TW.length || nach.ABW.length < a || nach.MF.length < mi || nach.ST.length < s) return;
+      const teil = { TW: nach.TW.slice(0, 1), ABW: nach.ABW.slice(0, a), MF: nach.MF.slice(0, mi), ST: nach.ST.slice(0, s) };
+      const sum = POS.reduce((acc, p) => acc + teil[p].reduce((x, y) => x + w(y), 0), 0);
+      if (!best || sum > best.sum + 1e-9) best = Object.assign({ f, sum }, teil);
+    });
+    return best;
+  }
+  const FELD_SVG = '<svg class="linien" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
+    '<rect x="2.5" y="1.5" width="95" height="97" rx="1"/><path d="M37 1.5a13 9 0 0 0 26 0"/>' +
+    '<rect x="21" y="80" width="58" height="18.5"/><rect x="37" y="92" width="26" height="6.5"/><path d="M41 80a9 5.5 0 0 1 18 0"/></svg>';
+  function feld(e, zahl, titel, info, kapId) {
+    if (!e) return "";
+    const reihe = a => '<div class="reihe">' + a.map(x => '<div class="fs' + (kapId && x.id === kapId ? " kap" : "") + '"><span class="trikot">' + zahl(x) +
+      '</span><span class="nm">' + esc(x.name) + '</span><span class="vr">' + esc(x.verein) + '</span></div>').join("") + '</div>';
+    return '<div class="feld" role="img" aria-label="' + esc(titel + " (" + e.f + "): " + POS.flatMap(p => e[p].map(x => x.name)).join(", ")) + '">' + FELD_SVG +
+      '<span class="formation">' + e.f + '</span>' + (info ? '<span class="feldinfo">' + info + '</span>' : "") +
+      reihe(e.ST) + reihe(e.MF) + reihe(e.ABW) + reihe(e.TW) + '</div>';
+  }
+
+  // ------------------------------------------------------------ Spieler
+  function renderSpieler() {
+    const el = document.getElementById("v-spieler");
+    const leer = statLeer();
+    if (leer) { el.innerHTML = leer; return; }
+    const S = stat();
+    let h = statKopf("Spieler", S);
+    h += chips([["beliebt", "Beliebt"], ["punkte", "Punkte"], ["scorer", "Scorer"], ["kapitaene", "Kapitäne"], ["vereine", "Vereine"]], SX.sp, "sicht");
+    const tageTxt = n => n + (n === 1 ? " Spieltag" : " Spieltage");
+    const spAuf = s => () => '<div class="aufzu"><h3>Punkte je Spieltag (wie oft aufgestellt)</h3><div class="tage">' +
+      s.je.map(j => '<span>ST ' + j.d + '<b>' + NF.format(j.pkt) + '</b>' + j.n + '×</span>').join("") + '</div>' +
+      '<h3 style="margin-top:12px">Aufgestellt von</h3><ul class="wer">' + [...s.wer.entries()].sort((a, b) => b[1] - a[1]).map(([m, n]) =>
+        '<li><span' + (m === ich ? ' class="du"' : "") + '>' + esc((S.mg.find(x => x.id === m) || { name: m }).name) + '</span><span>' + n + '×</span></li>').join("") + '</ul></div>';
+    let items = [];
+    if (SX.sp === "beliebt") {
+      const nM = S.mg.length;
+      const e = elf(S.sp, s => s.picks);
+      h += '<p class="erklaer">Liga-Elf: die am häufigsten aufgestellten Spieler. Die Zahl zeigt, wie oft.</p>';
+      h += feld(e, s => s.picks, "Liga-Elf", tageTxt(S.tage.length));
+      h += '<h2>Am häufigsten aufgestellt</h2>';
+      items = S.sp.slice().sort((a, b) => b.picks - a.picks || b.pkt - a.pkt).map(s => ({
+        id: s.id, attr: "spx", n: s.picks, titel: spTitel(s), wert: s.picks + "<small>×</small>", teile: [{ v: s.picks }],
+        sub: '<span>bei ' + s.wer.size + ' von ' + nM + ' Managern</span><span>Ø ' + NF0(s.pkt / s.tage) + ' Pkt</span>' + duTag(s), aufzu: spAuf(s),
+      }));
+    } else if (SX.sp === "punkte") {
+      const min = Math.min(MIN_TAGE(), S.tage.length);
+      const liste = S.sp.filter(s => s.tage >= min).map(s => Object.assign(s, { schnitt: s.pkt / s.tage }));
+      const e = elf(liste, s => s.schnitt);
+      h += '<p class="erklaer">Bester Punkteschnitt an den Spieltagen, an denen ihn jemand aufgestellt hatte (mindestens ' + tageTxt(min) + ').</p>';
+      h += feld(e, s => NF0(s.schnitt), "Elf mit dem besten Schnitt", "Ø Punkte");
+      h += '<h2>Bester Schnitt</h2>';
+      items = liste.sort((a, b) => b.schnitt - a.schnitt).map(s => ({
+        id: s.id, attr: "spx", n: Math.round(s.schnitt), titel: spTitel(s), wert: NF0(s.schnitt), teile: [{ v: Math.max(0, s.schnitt) }],
+        sub: '<span>' + tageTxt(s.tage) + '</span><span>bester ' + NF.format(s.best) + ' (ST ' + s.bestTag + ')</span>' + duTag(s), aufzu: spAuf(s),
+      }));
+    } else if (SX.sp === "scorer") {
+      h += '<p class="erklaer">Tore und Vorlagen an Spieltagen, an denen der Spieler bei mindestens einem Manager aufgestellt war.</p>';
+      h += '<div class="legende dicht" aria-hidden="true"><span><i style="background:var(--laeuft)"></i>Tore</span><span><i style="background:var(--offen)"></i>Vorlagen</span></div>';
+      items = S.sp.filter(s => s.t + s.v > 0).sort((a, b) => (b.t + b.v) - (a.t + a.v) || b.t - a.t || b.picks - a.picks).map(s => ({
+        id: s.id, attr: "spx", n: s.t + s.v, titel: spTitel(s), wert: String(s.t + s.v), teile: [{ v: s.t, c: "tor" }, { v: s.v, c: "vor" }],
+        sub: '<span>' + s.t + (s.t === 1 ? " Tor" : " Tore") + ', ' + s.v + (s.v === 1 ? " Vorlage" : " Vorlagen") + '</span><span>' + s.picks + '× aufgestellt</span>' + duTag(s), aufzu: spAuf(s),
+      }));
+    } else if (SX.sp === "kapitaene") {
+      h += '<p class="erklaer">Wie oft ein Spieler Kapitän war und wie viele Extrapunkte das gebracht hat (Kapitän zählt doppelt).</p>';
+      items = S.sp.filter(s => s.kap > 0).sort((a, b) => b.kap - a.kap || b.kapBonus - a.kapBonus).map(s => ({
+        id: s.id, attr: "spx", n: s.kap, titel: spTitel(s), wert: s.kap + "<small>×</small>", teile: [{ v: s.kap }],
+        sub: '<span>Bonus ' + NF.format(s.kapBonus) + ' Pkt</span><span>Ø ' + NF0(s.kapBonus / s.kap) + ' je Einsatz</span>', aufzu: spAuf(s),
+      }));
+    } else {
+      const ges = S.rows.length || 1;
+      h += '<p class="erklaer">Anteil der Aufstellungsplätze je Verein und Punkteschnitt pro Einsatz.</p>';
+      items = S.vr.slice().sort((a, b) => b.picks - a.picks || b.pkt - a.pkt).map(c => ({
+        id: c.id, attr: "vx", n: c.picks, titel: esc(c.name), wert: NF1.format(c.picks / ges * 100) + "<small>%</small>", teile: [{ v: c.picks }],
+        sub: '<span>' + c.picks + ' Einsätze</span><span>Ø ' + NF0(c.pkt / c.picks) + ' Pkt</span><span>' + c.spieler.size + ' Spieler</span>',
+        aufzu: () => '<div class="aufzu"><h3>Meistaufgestellte Spieler</h3><ul class="wer">' + [...c.spieler.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([p, n]) =>
+          '<li><span>' + esc((S.sp.find(x => x.id === p) || { name: p }).name) + '</span><span>' + n + '×</span></li>').join("") + '</ul></div>',
+      }));
+    }
+    h += rangliste(items, SX.sp === "vereine" ? "Vereine" : "Spieler");
+    el.innerHTML = h;
+    chipSichtbar(el);
+  }
+
+  // ------------------------------------------------------------ Manager
+  function renderManager() {
+    const el = document.getElementById("v-manager");
+    const leer = statLeer();
+    if (leer) { el.innerHTML = leer; return; }
+    const S = stat();
+    if (SX.profil) {
+      const m = S.mg.find(x => x.id === SX.profil);
+      el.innerHTML = m ? profil(S, m) : '<button class="zurueck" data-zurueck="1">' + SVG_PFEIL + 'Alle Manager</button>' +
+        hinweis("Keine Daten", "Für diesen Manager gibt es im gewählten Zeitraum keine Aufstellungen.");
+      return;
+    }
+    let h = statKopf("Manager", S);
+    if (ich && S.mg.some(x => x.id === ich)) h = h.replace(/<\/p><\/div>$/, '</p><button class="profilknopf" data-profil="' + esc(ich) + '">Dein Profil ›</button></div>');
+    const sichten = [["scorer", "Scorer"], ["kapitaen", "Kapitän"], ["exklusiv", "Exklusiv"], ["zunull", "Zu null"], ["karten", "Karten"]];
+    if (S.hatPreis) sichten.push(["preis", "Pro Mio"]);
+    if (SX.mg === "preis" && !S.hatPreis) SX.mg = "scorer";
+    h += chips(sichten, SX.mg, "msicht");
+    const basis = m => ({ id: m.id, attr: "profil", meins: m.id === ich, titel: esc(m.name) + (m.id === ich ? "<small>du</small>" : "") });
+    let items = [];
+    if (SX.mg === "scorer") {
+      h += '<p class="erklaer">Tore und Vorlagen aller aufgestellten Spieler zusammen. Antippen öffnet das Profil.</p>';
+      h += '<div class="legende dicht" aria-hidden="true"><span><i style="background:var(--laeuft)"></i>Tore</span><span><i style="background:var(--offen)"></i>Vorlagen</span></div>';
+      items = S.mg.slice().sort((a, b) => (b.t + b.v) - (a.t + a.v) || b.t - a.t).map(m => Object.assign(basis(m), {
+        n: m.t + m.v, wert: String(m.t + m.v), teile: [{ v: m.t, c: "tor" }, { v: m.v, c: "vor" }],
+        sub: '<span>' + m.t + ' Tore, ' + m.v + ' Vorlagen</span><span>Ø ' + NF1.format((m.t + m.v) / m.tage.size) + ' je Spieltag</span>',
+      }));
+    } else if (SX.mg === "kapitaen") {
+      h += '<p class="erklaer">Extrapunkte durch den Kapitän, dessen Punkte doppelt zählen.</p>';
+      items = S.mg.slice().sort((a, b) => b.kapBonus - a.kapBonus).map(m => Object.assign(basis(m), {
+        n: m.kapBonus, wert: NF.format(m.kapBonus), teile: [{ v: Math.max(0, m.kapBonus) }],
+        sub: m.kapBest ? '<span>Ø ' + NF0(m.kapBonus / Math.max(1, m.kapJe.length)) + ' je Spieltag</span><span>bester: ' + esc(m.kapBest.r.name) + ' ' + NF.format(m.kapBest.r.pkt) + ' (ST ' + m.kapBest.r.d + ')</span>' : '<span>kein Kapitän gespeichert</span>',
+      }));
+    } else if (SX.mg === "exklusiv") {
+      h += '<p class="erklaer">Punkte von Spielern, die am jeweiligen Spieltag kein anderer Manager aufgestellt hatte.</p>';
+      items = S.mg.slice().sort((a, b) => b.exPkt - a.exPkt).map(m => Object.assign(basis(m), {
+        n: m.exPkt, wert: NF.format(m.exPkt), teile: [{ v: Math.max(0, m.exPkt) }],
+        sub: '<span>' + m.exN + ' exklusive Einsätze</span>' + (m.exBest ? '<span>bester: ' + esc(m.exBest.r.name) + ' ' + NF.format(m.exBest.eff) + '</span>' : ""),
+      }));
+    } else if (SX.mg === "zunull") {
+      h += '<p class="erklaer">Spiele ohne Gegentor der eigenen Torhüter.</p>';
+      items = S.mg.slice().sort((a, b) => b.zn - a.zn || b.pos.TW - a.pos.TW).map(m => Object.assign(basis(m), {
+        n: m.zn, wert: String(m.zn), teile: [{ v: m.zn }],
+        sub: '<span>Torwart-Punkte ' + NF.format(m.pos.TW) + '</span><span>Ø ' + NF0(m.pos.TW / m.tage.size) + ' je Spieltag</span>',
+      }));
+    } else if (SX.mg === "karten") {
+      h += '<p class="erklaer">Gelbe und Rote Karten der eigenen Spieler. Gibt in Kickbase Punktabzug.</p>';
+      items = S.mg.slice().sort((a, b) => (b.g + b.r) - (a.g + a.r) || b.r - a.r).map(m => Object.assign(basis(m), {
+        n: m.g + m.r, wert: String(m.g + m.r), teile: [{ v: m.g + m.r }],
+        sub: '<span class="karten-zeile" style="margin:0;font-size:13px"><span><span class="karte klein"></span>' + m.g + ' Gelb</span><span><span class="karte klein rot"></span>' + m.r + ' Rot</span></span>',
+      }));
+    } else {
+      h += '<p class="erklaer">Punkte je Million Marktwert, nur Spieltage mit gespeicherten Preisen.</p>';
+      items = S.mg.filter(m => m.preis > 0).map(m => Object.assign(m, { ppm: m.pktPreis / m.preis })).sort((a, b) => b.ppm - a.ppm).map(m => Object.assign(basis(m), {
+        n: Math.round(m.ppm * 10), wert: NF1.format(m.ppm), teile: [{ v: Math.max(0, m.ppm) }],
+        sub: '<span>' + m.preisTage.size + (m.preisTage.size === 1 ? " Spieltag" : " Spieltage") + '</span><span>Ø Kader ' + NF1.format(m.preis / m.preisTage.size) + ' Mio</span>',
+      }));
+    }
+    h += rangliste(items, "Manager");
+    el.innerHTML = h;
+    chipSichtbar(el);
+  }
+
+  function profil(S, m) {
+    const alle = S.mg;
+    const schnitt = f => alle.reduce((a, x) => a + f(x), 0) / (alle.length || 1);
+    const sa = S.saison[m.id];
+    const rangfolge = Object.entries(S.saison).sort((a, b) => b[1].sum - a[1].sum);
+    const platz = rangfolge.findIndex(([id]) => id === m.id) + 1;
+    const besteTage = Object.values(S.saison);
+    const delta = (wert, liga, fmt) => {
+      const diff = wert - liga;
+      if (Math.abs(diff) < 0.5) return "";
+      return '<span class="delta ' + (diff > 0 ? "plus" : "minus") + '">' + (diff > 0 ? "+" : "−") + fmt(Math.abs(diff)) + '</span>';
+    };
+    const kachel = (w, t, f, fmt) => {
+      const liga = schnitt(f);
+      return '<div class="kachel"><div class="w">' + w + delta(f(m), liga, fmt) + '</div><div class="t">' + t + '</div><div class="vgl">Liga Ø ' + fmt(liga) + '</div></div>';
+    };
+    let h = '<button class="zurueck" data-zurueck="1">' + SVG_PFEIL + 'Alle Manager</button>';
+    h += '<div class="held"><div class="statzeile"><h1>' + esc(m.name) + '</h1>' + (S.alleTage.length > 3 ? statKopf("", S).match(/<div class="zeitraum[\s\S]*?<\/div>/)[0] : "") + '</div><p class="lage">' +
+      (sa ? (platz ? "<b>Platz " + platz + "</b> · " : "") + NF.format(sa.sum) + " Punkte · Ø " + NF0(sa.sum / sa.n) + " je Spieltag" : NF.format(m.pkt) + " Punkte") +
+      (SX.zeit === "form" ? " · letzte 3 Spieltage" : "") + '</p></div>';
+    h += '<div class="kacheln">' +
+      kachel(m.t, "Tore", x => x.t, NF0) +
+      kachel(m.v, "Vorlagen", x => x.v, NF0) +
+      kachel(m.zn, "Zu null", x => x.zn, v => NF1.format(v)) +
+      kachel(NF.format(m.kapBonus), "Kapitän-Bonus", x => x.kapBonus, NF0) +
+      kachel(NF.format(m.exPkt), "Exklusiv-Punkte", x => x.exPkt, NF0) +
+      (sa ? (() => {
+        const lb = besteTage.reduce((a, x) => a + x.best, 0) / besteTage.length;
+        return '<div class="kachel"><div class="w">' + NF.format(sa.best) + delta(sa.best, lb, NF0) + '</div><div class="t">Bester Spieltag (ST ' + sa.bestTag +
+          ')</div><div class="vgl">Liga Ø ' + NF0(lb) + '</div></div>';
+      })() : kachel(m.g + m.r, "Karten", x => x.g + x.r, v => NF1.format(v))) + '</div>' +
+      '<p class="erklaer" style="margin-top:8px">Plus und Minus im Vergleich zum Liga-Schnitt. Exklusiv: Punkte von Spielern, die am Spieltag kein anderer Manager hatte.</p>';
+
+    // Stamm-Elf
+    const meist = [...m.spieler.values()];
+    const kapFav = meist.slice().sort((a, b) => b.kap - a.kap || b.pkt - a.pkt)[0];
+    h += '<h2>Stamm-Elf</h2><p class="erklaer" style="margin-top:-4px">Am häufigsten aufgestellt, die Zahl zeigt wie oft.' + (kapFav && kapFav.kap ? ' Gelb: liebster Kapitän (' + esc(kapFav.name) + ', ' + kapFav.kap + '×).' : "") + '</p>';
+    h += feld(elf(meist, s => s.n), s => s.n, "Stamm-Elf von " + m.name, NF.format(meist.length) + " Spieler genutzt", kapFav && kapFav.kap ? kapFav.id : null);
+
+    // Punkte nach Position
+    const nT = m.tage.size || 1;
+    const ligaPos = p => schnitt(x => x.pos[p] / (x.tage.size || 1));
+    const maxPos = Math.max(...POS.map(p => Math.max(m.pos[p] / nT, ligaPos(p)))) || 1;
+    h += '<h2>Punkte nach Position</h2><p class="erklaer" style="margin-top:-4px">Ø je Spieltag inklusive Kapitän. Der helle Strich zeigt den Liga-Schnitt.</p>';
+    h += POS.map(p => {
+      const w = m.pos[p] / nT, l = ligaPos(p);
+      return '<div class="spur-z"><span class="pos">' + p + '</span><span class="spur" role="img" aria-label="' + p + ': ' + NF0(w) + ', Liga ' + NF0(l) + '"><span style="width:' +
+        (Math.max(0, w) / maxPos * 100).toFixed(1) + '%"></span><i style="left:' + (Math.max(0, l) / maxPos * 100).toFixed(1) + '%"></i></span><span class="zahl">' + NF0(w) + '</span></div>';
+    }).join("");
+    h += '<div class="karten-zeile"><span><span class="karte klein"></span>' + m.g + ' Gelb</span><span><span class="karte klein rot"></span>' + m.r + ' Rot</span><span>' + m.zn + '× zu null</span></div>';
+
+    // Beste Einzelleistungen
+    h += '<h2>Beste Einzelleistungen</h2>' + m.einzel.slice().sort((a, b) => b.eff - a.eff).slice(0, 5).map(e =>
+      '<div class="ez"><span class="d">ST ' + e.r.d + '</span><span class="n">' + esc(e.r.name) + (e.r.k ? '<span class="k">×2</span>' : "") + '<em>' + esc(e.r.verein) +
+      (e.r.t || e.r.v ? " · " + (e.r.t ? e.r.t + " T" : "") + (e.r.t && e.r.v ? ", " : "") + (e.r.v ? e.r.v + " V" : "") : "") + '</em></span><span class="p">' + NF.format(e.eff) + '</span></div>').join("");
+
+    // Kapitäne je Spieltag
+    if (m.kapJe.length) {
+      h += '<h2>Kapitäne</h2>' + m.kapJe.slice().sort((a, b) => a.r.d - b.r.d).map(e =>
+        '<div class="ez"><span class="d">ST ' + e.r.d + '</span><span class="n">' + esc(e.r.name) + '<em>' + esc(e.r.verein) + ' · ' + NF.format(e.r.pkt) + ' × 2</em></span><span class="p">' + NF.format(e.eff) + '</span></div>').join("");
+    }
+
+    // Vereine
+    const vv = [...m.vereine.entries()].sort((a, b) => b[1] - a[1]);
+    const top = vv.slice(0, 7), rest = vv.slice(7).reduce((a, x) => a + x[1], 0);
+    if (rest) top.push(["Andere (" + (vv.length - 7) + ")", rest]);
+    const maxV = Math.max(...top.map(x => x[1])) || 1;
+    h += '<h2>Vereine</h2><p class="erklaer" style="margin-top:-4px">Aufstellungsplätze je Verein, insgesamt ' + vv.length + ' verschiedene.</p>' + top.map(([n, c]) =>
+      '<div class="spur-z breit"><span class="lbl">' + esc(n) + '</span><span class="spur' + (/^Andere \(/.test(n) ? " rest" : "") + '"><span style="width:' + (c / maxV * 100).toFixed(1) + '%"></span></span><span class="zahl">' + c + '</span></div>').join("");
+    if (m.id !== ich) h += '<button class="ichbin" style="margin-top:22px" data-ich="' + esc(m.id) + '">Das bin ich</button>';
+    return h;
+  }
+  function chipSichtbar(el) {
+    const c = el.querySelector(".chips"), a = c && c.querySelector('[aria-pressed="true"]');
+    if (a && a.offsetLeft + a.offsetWidth > c.clientWidth) c.scrollLeft = a.offsetLeft + a.offsetWidth - c.clientWidth + 16;
+  }
+  function renderStats() {
+    renderSpieler(); renderManager();
+  }
+  function profilAuf(id) {
+    SX.profil = id;
+    try { history.pushState({ kbProfil: id }, ""); } catch (e) { /* egal */ }
+    wechseln("manager");
+    renderManager();
+  }
+  function profilZu() {
+    if (history.state && history.state.kbProfil) { history.back(); return; }
+    SX.profil = null; renderManager(); window.scrollTo(0, 0);
+  }
+  window.addEventListener("popstate", e => {
+    SX.profil = (e.state && e.state.kbProfil) || null;
+    if (D) renderManager();
+    window.scrollTo(0, 0);
+  });
+
+  // ------------------------------------------------------------ Rahmen
+  function rendern() {
+    if (!D) return;
+    document.getElementById("standText").textContent = D.stand ? "Stand " + uhr(D.stand) : "Stand " + uhr(ladezeit);
+    renderLive(); renderStrafen(); renderSaison(); renderStats();
+    document.getElementById("fuss").textContent = "Daten aus Kickbase, Punkte alle 10 Minuten aktualisiert.";
+  }
+  function zeigeEinrichtung() {
+    document.getElementById("v-live").innerHTML = '<div class="hinweis"><strong>Noch nicht verbunden</strong>Trag in der Datei config.js die Adresse deiner Apps-Script-Web-App ein.</div>';
+    document.getElementById("standText").textContent = "";
+  }
+  function zeigeFehler(msg) {
+    document.getElementById("v-live").innerHTML = '<div class="hinweis"><strong>Daten konnten nicht geladen werden</strong>' + esc(msg) +
+      '. Prüf die Internetverbindung oder die Web-App-Adresse in config.js.<br><button id="nochmal">Erneut laden</button></div>';
+  }
+  function wechseln(v) {
+    ansicht = v; store.set("kb_ansicht", v);
+    document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.v === v));
+    ["live", "strafen", "saison", "spieler", "manager"].forEach(x => { document.getElementById("v-" + x).hidden = x !== v; });
+    chipSichtbar(document.getElementById("v-" + v));
+    window.scrollTo(0, 0);
+  }
+  function statNeu(fn) { fn(); statKey = ""; SX.alle = false; SX.auf = null; renderStats(); }
+
+  document.addEventListener("click", e => {
+    const t = e.target.closest("button, tr[data-g]");
+    if (!t) return;
+    if (t.dataset.v) {
+      if (t.dataset.v === "manager" && ansicht === "manager" && SX.profil) { profilZu(); return; }
+      wechseln(t.dataset.v); return;
+    }
+    if (t.id === "stand" || t.id === "nochmal") { laden(); return; }
+    if (t.id === "histNochmal") { historieLaden(true); return; }
+    if (t.dataset.zeit) { statNeu(() => { SX.zeit = t.dataset.zeit; store.set("kb_zeit", SX.zeit); }); return; }
+    if (t.dataset.sicht) { statNeu(() => { SX.sp = t.dataset.sicht; store.set("kb_sp", SX.sp); }); return; }
+    if (t.dataset.msicht) { statNeu(() => { SX.mg = t.dataset.msicht; store.set("kb_mg", SX.mg); }); return; }
+    if (t.dataset.mehr) { SX.alle = true; renderStats(); return; }
+    if (t.dataset.spx || t.dataset.vx) {
+      const k = t.dataset.spx ? "spx:" + t.dataset.spx : "vx:" + t.dataset.vx;
+      SX.auf = SX.auf === k ? null : k; renderSpieler(); return;
+    }
+    if (t.dataset.profil) { profilAuf(t.dataset.profil); window.scrollTo(0, 0); return; }
+    if (t.dataset.zurueck) { profilZu(); return; }
+    if (t.dataset.m) { offen.has(t.dataset.m) ? offen.delete(t.dataset.m) : offen.add(t.dataset.m); renderLive(); return; }
+    if (t.dataset.ich !== undefined) { ich = ich === t.dataset.ich ? null : t.dataset.ich; store.set("kb_ich", ich); gewaehlt = null; rendern(); return; }
+    if (t.dataset.tag) {
+      const d = Number(t.dataset.tag);
+      if (!offenTage) { const tg = (D.strafen.tage || []).map(x => x.d); offenTage = new Set(tg.length ? [Math.max(...tg)] : []); }
+      offenTage.has(d) ? offenTage.delete(d) : offenTage.add(d);
+      renderStrafen(); return;
+    }
+    if (t.dataset.g) { gewaehlt = t.dataset.g; renderSaison(); }
+  });
+  let tipWeg = () => {};
+  document.addEventListener("pointerdown", e => { const box = document.getElementById("chart"); if (!box || !box.contains(e.target)) tipWeg(); }, true);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && Date.now() - ladezeit > 30000) laden(); });
+  setInterval(() => { if (document.visibilityState === "visible") laden(); }, 60000);
+  setInterval(() => { if (D && document.visibilityState === "visible") { renderLive(); } }, 20000);
+  wechseln(ansicht);
+  try { const hh = JSON.parse(store.get("kb_hist") || "null"); if (hh && hh.z) hSetzen(hh); } catch (e) { /* egal */ }
+  try { const alt = JSON.parse(store.get("kb_daten") || "null"); if (alt && alt.ok) { D = alt; rendern(); } } catch (e) { /* egal */ }
+  laden();
+})();
+</script>
+</body>
+</html>
