@@ -166,7 +166,8 @@ h2 + .erklaer { margin-top: -4px; }
 .zeit.live { border-color: var(--live); }
 .zeit.live .zu { color: var(--live); font-style: italic; }
 .ich { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--flaeche); display: flex; align-items: center; gap: 12px; }
-.ich .wer { font: 800 20px/1 var(--ueber); text-transform: uppercase; }
+.ich > div { flex: 1; min-width: 0; }
+.ich .ich-titel { font: 800 20px/1 var(--ueber); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ich .was { font-size: 13px; color: var(--grau); margin-top: 4px; }
 .ich > .zahl { margin-left: auto; font-size: 28px; }
 .details { padding: 2px 0 18px; }
@@ -284,6 +285,130 @@ table.saison tr.gewaehlt .mn span { color: var(--gold); font-weight: 600; }
 .karten-zeile { display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--grau); margin: 14px 0 0; }
 .karten-zeile span { display: inline-flex; align-items: center; gap: 8px; }
 
+/* Medaillen: Vitrine mit drehenden 3D-Münzen */
+.vitrine { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 18px calc(-1 * var(--rand)) 0; padding: 6px var(--rand) 8px; scrollbar-width: none; }
+.vitrine::-webkit-scrollbar { display: none; }
+.mk { position: relative; flex: 0 0 84%; max-width: 340px; scroll-snap-align: center; border-radius: 22px; padding: 28px 16px 20px; text-align: center; overflow: hidden;
+  background: radial-gradient(120% 75% at 50% 0%, var(--glut), transparent 62%), var(--flaeche); }
+.mk.t-gold { --glut: rgba(247, 197, 30, .26); }
+.mk.t-silber { --glut: rgba(214, 222, 232, .18); }
+.mk.t-bronze { --glut: rgba(222, 140, 78, .24); }
+.mk.t-legende { --glut: rgba(138, 104, 255, .34); }
+.mk.t-holz { --glut: rgba(160, 104, 56, .26); }
+.strahlen { position: absolute; left: 50%; top: 114px; width: 380px; height: 380px; margin: -190px 0 0 -190px; border-radius: 50%; pointer-events: none;
+  background: repeating-conic-gradient(rgba(255, 255, 255, .07) 0deg 5deg, transparent 5deg 15deg);
+  -webkit-mask: radial-gradient(circle, #000 18%, transparent 66%); mask: radial-gradient(circle, #000 18%, transparent 66%); }
+@media (prefers-reduced-motion: no-preference) { .strahlen { animation: drehen 48s linear infinite; } }
+.m-tipp { display: block; margin: 0 auto; position: relative; }
+.mk h3 { margin: 12px 0 6px; font: 800 27px/1 var(--ueber); text-transform: uppercase; letter-spacing: .01em; }
+.mk .grund { margin: 0 auto; max-width: 280px; font-size: 14px; line-height: 1.35; color: var(--grau); min-height: 38px; }
+.mk .sieger { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; margin-top: 14px; }
+.mk .sieger > span { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+.stufe { display: inline-block; margin-top: 22px; padding: 5px 10px 4px; border-radius: 999px; font: 700 10.5px/1 var(--schrift); letter-spacing: .14em; text-transform: uppercase; }
+.stufe.t-gold { color: #2A1E00; background: linear-gradient(90deg, #E9B93A, #FFE38E, #D9A62A); }
+.stufe.t-silber { color: #1E2228; background: linear-gradient(90deg, #AEB5BE, #F4F6F8, #9EA6B0); }
+.stufe.t-bronze { color: #2B1606; background: linear-gradient(90deg, #C77E44, #F2BE8A, #B06A35); }
+.stufe.t-legende { color: #fff; background: linear-gradient(90deg, #7D5CFF, #2EC5FF, #FF5CC8, #FFC94A); background-size: 200% 100%; }
+@media (prefers-reduced-motion: no-preference) { .stufe.t-legende { animation: schimmer 4s linear infinite; } }
+@keyframes schimmer { to { background-position: 200% 0; } }
+.stufe.t-holz { color: #F6E7D2; background: linear-gradient(90deg, #6B4423, #9A6A3C, #5E3A1D); }
+.punkte-nav { display: flex; justify-content: center; gap: 6px; margin-top: 4px; }
+.punkte-nav i { width: 6px; height: 6px; border-radius: 3px; background: #3A3A3D; transition: width .25s, background .25s; }
+.punkte-nav i.an { width: 18px; background: var(--text); }
+
+/* 3D-Münze */
+.m3d { --g: 168px; --dicke: 10px; --dauer: 9s; --verz: 0s; position: relative; width: var(--g); height: var(--g); perspective: 1100px; }
+.m3d .dreh { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(9deg) rotateY(-24deg); }
+.m3d .seite { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.m3d .vorn { transform: translateZ(calc(var(--dicke) / 2)); }
+.m3d .hinten { transform: rotateY(180deg) translateZ(calc(var(--dicke) / 2)); }
+.m3d .seite svg { display: block; width: 100%; height: 100%; }
+.m3d .rand i { position: absolute; inset: 1.5px; border-radius: 50%; background: var(--randf); }
+.m3d.t-gold { --randf: #9A7114; } .m3d.t-silber { --randf: #858C95; } .m3d.t-bronze { --randf: #87501F; } .m3d.t-legende { --randf: #8A6A22; } .m3d.t-holz { --randf: #4B2F16; }
+.m3d .vorn::after { content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; mix-blend-mode: overlay;
+  background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, .75) 48%, transparent 60%); background-size: 320% 100%; background-position: 130% 0; }
+.m3d::after { content: ""; position: absolute; left: 20%; right: 20%; bottom: -18px; height: 14px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, .6), transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .m3d .dreh { animation: m-dreh var(--dauer) linear infinite; animation-delay: var(--verz); }
+  .m3d .vorn { animation: m-licht var(--dauer) linear infinite; animation-delay: var(--verz); }
+  .m3d .hinten { animation: m-licht var(--dauer) linear infinite; animation-delay: calc(var(--verz) - var(--dauer) / 2); }
+  .m3d .vorn::after { animation: m-glanz 3.6s ease-in-out infinite; }
+  .m3d::after { animation: m-schatten var(--dauer) linear infinite; animation-delay: var(--verz); }
+}
+@keyframes m-dreh { from { transform: rotateX(9deg) rotateY(0deg); } to { transform: rotateX(9deg) rotateY(360deg); } }
+@keyframes m-licht { 0%, 100% { filter: brightness(1.1); } 22% { filter: brightness(.82); } 50% { filter: brightness(.62); } 78% { filter: brightness(.82); } }
+@keyframes m-glanz { 0% { background-position: 130% 0; } 55%, 100% { background-position: -30% 0; } }
+@keyframes m-schatten { 0%, 50%, 100% { transform: scaleX(1); opacity: 1; } 25%, 75% { transform: scaleX(.3); opacity: .7; } }
+.msvg .bogen { font-family: var(--ueber); font-weight: 800; letter-spacing: .12em; }
+.msvg .name { font-family: var(--ueber); font-weight: 800; letter-spacing: .04em; }
+.msvg .gr { fill: var(--praeg); stroke: var(--praeg); }
+.msvg .hl { fill: rgba(255, 255, 255, .55); stroke: rgba(255, 255, 255, .55); transform: translate(0, 1.2px); }
+.msvg text { stroke: none !important; }
+.msvg .ic { fill: none !important; }
+.msvg circle.gr { fill: none; }
+.t-gold { --praeg: #6E4E07; } .t-silber { --praeg: #4D545D; } .t-bronze { --praeg: #5A3011; } .t-legende { --praeg: #FFFFFF; } .t-holz { --praeg: #2E1A09; }
+.t-legende .msvg .hl { fill: rgba(60, 20, 120, .35); stroke: rgba(60, 20, 120, .35); }
+
+/* Enthüllung, wenn es neue Medaillen gibt */
+@media (prefers-reduced-motion: no-preference) {
+  .vitrine.enthuellen .m3d { animation: m-rein 1.5s cubic-bezier(.18, .9, .25, 1.15) both; }
+  .vitrine.enthuellen .mk:nth-child(2) .m3d { animation-delay: .3s; }
+  .vitrine.enthuellen .mk:nth-child(3) .m3d { animation-delay: .6s; }
+  .vitrine.enthuellen .mk::before { content: ""; position: absolute; left: 50%; top: 114px; width: 10px; height: 10px; margin: -5px; border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, .5); animation: m-blitz 1.6s ease-out .5s both; }
+}
+@keyframes m-rein { 0% { transform: scale(.15) rotate(-30deg); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes m-blitz { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .55); } 100% { box-shadow: 0 0 0 170px rgba(255, 255, 255, 0); } }
+
+/* Mini-Münzen */
+.mm { display: inline-block; width: 52px; height: 52px; flex: none; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .5)); }
+.mm svg { display: block; width: 100%; height: 100%; }
+.mm.klein { width: 26px; height: 26px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5)); }
+.mm.gross { width: 170px; height: 170px; }
+.mm.t-legende svg { filter: saturate(1.2); }
+.zaehl { display: inline-flex; align-items: center; gap: 5px; font: 700 13px/1 var(--ziffer); color: var(--text); }
+.zaehl i { width: 11px; height: 11px; border-radius: 50%; }
+.zaehl.t-gold i { background: linear-gradient(135deg, #FFE38E, #C8961E); }
+.zaehl.t-silber i { background: linear-gradient(135deg, #F4F6F8, #8F98A2); }
+.zaehl.t-bronze i { background: linear-gradient(135deg, #F2BE8A, #A9622E); }
+.zaehl.t-legende i { background: conic-gradient(#7D5CFF, #2EC5FF, #FF5CC8, #FFC94A, #7D5CFF); }
+.zaehl.t-holz i { background: linear-gradient(135deg, #A87443, #5A3719); }
+.schrank { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 12px 8px; padding-left: 62px; }
+.sm, .alb { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; min-width: 0; }
+.sm b, .alb b { display: block; max-width: 100%; font: 800 13px/1.1 var(--ueber); text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sm span, .alb span { font-size: 11px; color: var(--grau); line-height: 1.1; }
+.album { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.alb { background: var(--flaeche); border-radius: 16px; padding: 14px 6px 12px; }
+.alb .mm { width: 62px; height: 62px; }
+.med-banner { width: 100%; display: flex; align-items: center; gap: 4px; margin: 14px 0 0; padding: 10px 12px; border-radius: 14px; text-align: left;
+  background: linear-gradient(100deg, rgba(247, 197, 30, .16), rgba(138, 104, 255, .14)), var(--flaeche); }
+.med-banner .mm.klein { margin-right: -8px; }
+.med-banner > span:not(.mm) { margin-left: 16px; flex: 1; font-size: 13px; color: var(--grau); line-height: 1.3; }
+.med-banner b { display: block; color: var(--text); font: 800 16px/1.1 var(--ueber); text-transform: uppercase; letter-spacing: .02em; }
+.med-banner .pfeil { transform: rotate(-90deg); }
+nav.tabs button { position: relative; }
+nav.tabs button.neu::after { content: ""; position: absolute; top: 9px; left: calc(50% + 9px); width: 8px; height: 8px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 2px var(--bg); }
+
+/* Detailblatt */
+.blatt-hg { position: fixed; inset: 0; z-index: 20; background: rgba(0, 0, 0, .62); opacity: 0; transition: opacity .28s; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.blatt-hg.offen { opacity: 1; }
+.blatt { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-height: 90vh; overflow-y: auto; overscroll-behavior: contain; background: #18181B;
+  border-radius: 24px 24px 0 0; transform: translateY(105%); transition: transform .32s cubic-bezier(.2, .8, .2, 1); box-shadow: 0 -10px 40px rgba(0, 0, 0, .5); }
+.blatt.offen { transform: none; }
+.blatt-innen { max-width: 560px; margin: 0 auto; padding: 10px var(--rand) calc(28px + env(safe-area-inset-bottom)); text-align: center; position: relative; }
+.griff { width: 40px; height: 4px; border-radius: 2px; background: #3A3A3D; margin: 0 auto 6px; }
+.blatt-zu { position: absolute; right: 12px; top: 10px; width: 36px; height: 36px; border-radius: 50%; background: var(--flaeche-hoch); font-size: 22px; line-height: 36px; text-align: center; z-index: 2; }
+.blatt-kopf { position: relative; padding: 26px 0 8px; display: flex; justify-content: center; }
+.blatt-kopf .strahlen { top: 131px; }
+.blatt-titel { margin: 10px 0 8px; font-size: 30px; }
+.wofuer { margin: 0 auto 6px; max-width: 360px; color: var(--grau); font-size: 15px; }
+.blatt-h3 { margin: 20px 0 4px; text-align: left; font: 600 11px/1.3 var(--schrift); letter-spacing: .12em; text-transform: uppercase; color: var(--grau); }
+.blatt .ez { text-align: left; grid-template-columns: 40px auto minmax(0, 1fr); }
+.blatt .ez .n em { white-space: normal; }
+.ez .n span.du, .sp .n span.du { display: inline; }
+.blatt .ez.hervor { background: rgba(247, 197, 30, .08); border-radius: 12px; }
+body.blatt-an { overflow: hidden; }
+
 /* Hinweise */
 .hinweis { margin: 24px 0; padding: 16px; border-radius: 14px; background: var(--flaeche); color: var(--grau); font-size: 15px; }
 .hinweis strong { color: var(--text); display: block; margin-bottom: 4px; font: 800 19px/1.2 var(--ueber); text-transform: uppercase; }
@@ -294,14 +419,27 @@ table.saison tr.gewaehlt .mn span { color: var(--gold); font-weight: 600; }
 /* Navigation */
 nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: rgba(18, 18, 18, .97); backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px); border-top: 1px solid #232326; padding-bottom: env(safe-area-inset-bottom); }
-nav.tabs .wrap { display: grid; grid-template-columns: repeat(5, 1fr); height: 64px; padding: 0 4px; }
-nav.tabs button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; font: 600 10px/1 var(--schrift); letter-spacing: .08em; text-transform: uppercase; color: #6E6E73; min-width: 0; }
+nav.tabs .wrap { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); height: 64px; padding: 0 2px; }
+nav.tabs button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; font: 600 9.5px/1 var(--schrift); letter-spacing: .04em; text-transform: uppercase; color: #6E6E73; min-width: 0; }
 nav.tabs button svg { width: 24px; height: 24px; }
 nav.tabs button[aria-selected="true"] { color: var(--text); }
 section[hidden] { display: none; }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="mr-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF2B8"/><stop offset=".25" stop-color="#C9961F"/><stop offset=".5" stop-color="#FFE38A"/><stop offset=".75" stop-color="#8F6A12"/><stop offset="1" stop-color="#E8C150"/></linearGradient>
+  <radialGradient id="mf-gold" cx=".38" cy=".32" r=".85"><stop offset="0" stop-color="#FFF4C4"/><stop offset=".45" stop-color="#F0C64C"/><stop offset="1" stop-color="#A9780F"/></radialGradient>
+  <linearGradient id="mr-silber" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".25" stop-color="#9BA3AC"/><stop offset=".5" stop-color="#F2F4F7"/><stop offset=".75" stop-color="#6E757E"/><stop offset="1" stop-color="#D5DAE0"/></linearGradient>
+  <radialGradient id="mf-silber" cx=".38" cy=".32" r=".85"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#D3D9E0"/><stop offset="1" stop-color="#858D97"/></radialGradient>
+  <linearGradient id="mr-bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD3A8"/><stop offset=".25" stop-color="#A8642E"/><stop offset=".5" stop-color="#F0B47D"/><stop offset=".75" stop-color="#6E3E17"/><stop offset="1" stop-color="#D08A50"/></linearGradient>
+  <radialGradient id="mf-bronze" cx=".38" cy=".32" r=".85"><stop offset="0" stop-color="#FFD9B4"/><stop offset=".45" stop-color="#D58B4E"/><stop offset="1" stop-color="#874B1F"/></radialGradient>
+  <linearGradient id="mr-legende" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF2B8"/><stop offset=".3" stop-color="#C9961F"/><stop offset=".55" stop-color="#FFE38A"/><stop offset=".8" stop-color="#8F6A12"/><stop offset="1" stop-color="#F3D27A"/></linearGradient>
+  <linearGradient id="mf-legende" x1="0" y1="0" x2="1" y2="1"><animateTransform attributeName="gradientTransform" type="rotate" from="0 .5 .5" to="360 .5 .5" dur="6s" repeatCount="indefinite"/><stop offset="0" stop-color="#8A6BFF"/><stop offset=".35" stop-color="#39C8FF"/><stop offset=".7" stop-color="#FF6FD0"/><stop offset="1" stop-color="#FFD36B"/></linearGradient>
+  <linearGradient id="mr-holz" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A87443"/><stop offset=".3" stop-color="#5A3719"/><stop offset=".55" stop-color="#8B5A2E"/><stop offset=".8" stop-color="#3E2410"/><stop offset="1" stop-color="#7A4C26"/></linearGradient>
+  <radialGradient id="mf-holz" cx=".38" cy=".32" r=".85"><stop offset="0" stop-color="#C08853"/><stop offset=".5" stop-color="#94613A"/><stop offset="1" stop-color="#5E3A1C"/></radialGradient>
+  <pattern id="holzmaser" width="200" height="13" patternUnits="userSpaceOnUse"><path d="M0 6.5C35 2 70 11 110 5.5S175 3 200 7.5" stroke="rgba(55,28,8,.38)" stroke-width="1.3" fill="none"/></pattern>
+</defs></svg>
 <header class="kopf">
   <div class="wrap">
     <div class="liga">Männer Kickbase</div>
@@ -318,6 +456,7 @@ section[hidden] { display: none; }
   <section id="v-saison" aria-label="Saison" hidden></section>
   <section id="v-spieler" aria-label="Spieler" hidden></section>
   <section id="v-manager" aria-label="Manager" hidden></section>
+  <section id="v-medaillen" aria-label="Medaillen" hidden></section>
   <p class="fuss" id="fuss"></p>
 </main>
 
@@ -343,8 +482,14 @@ section[hidden] { display: none; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.6-3.9 3.7-6.5 7.5-6.5s6.9 2.6 7.5 6.5"/></svg>
       Manager
     </button>
+    <button role="tab" data-v="medaillen" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5l3 5M16 2.5l-3 5"/><circle cx="12" cy="14.5" r="6.5"/><path d="M12 11l1.1 2.2 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z"/></svg>
+      Medaillen
+    </button>
   </div>
 </nav>
+<div class="blatt-hg" id="blatt-hg" data-zu="1" hidden></div>
+<div class="blatt" id="blatt" role="dialog" aria-modal="true" aria-label="Medaille" hidden></div>
 
 <script>
 (function () {
@@ -522,10 +667,10 @@ section[hidden] { display: none; }
       return '<div class="zeit ' + st + '" role="listitem"><span class="tag">' + tag(t) + '</span><span class="uhr">' + uhr(t) + '</span><span class="zu">' + (zu || "&nbsp;") + '</span></div>';
     }).join("") + '</div>';
     if (ichM) {
-      h += '<div class="ich">' + managerAva(ichM.id, ichM.name, "s44") + '<div><div class="wer">Platz ' + ichM.platz + ' von ' + ms.length + '</div><div class="was">noch ' +
+      h += '<div class="ich">' + managerAva(ichM.id, ichM.name, "s44") + '<div><div class="ich-titel">Platz ' + ichM.platz + ' von ' + ms.length + '</div><div class="was">noch ' +
         NF1.format(ichM.l + ichM.o) + ' Mio im Spiel</div></div><span class="zahl p-tag">' + NF.format(ichM.punkte) + '</span></div>';
     }
-    h += '</div>';
+    h += medBanner() + '</div>';
     h += '<div class="legende" aria-hidden="true"><span><i style="background:var(--gespielt)"></i>gespielt</span><span><i style="background:var(--live)"></i>läuft</span><span><i style="background:var(--offen)"></i>noch offen</span></div>';
     h += '<ol class="liste">';
     const fuehrer = ms[0].punkte;
@@ -753,6 +898,7 @@ section[hidden] { display: none; }
     sp: store.get("kb_sp") || "beliebt", mg: store.get("kb_mg") || "scorer", zeit: store.get("kb_zeit") || "saison",
     alle: false, auf: null, profil: null,
   };
+  const MX = { auf: null };   // aufgeklappter Medaillenschrank
   const POS = ["TW", "ABW", "MF", "ST"];
   const FORMATIONEN = ["4-4-2", "4-3-3", "3-4-3", "3-5-2", "4-5-1", "5-3-2", "5-4-1", "3-6-1", "4-2-4", "5-2-3"];
   const MIN_TAGE = () => SX.zeit === "form" ? 2 : 3;
@@ -777,7 +923,7 @@ section[hidden] { display: none; }
       const h = await holen("historie");
       if (!h || h.ok === false) throw new Error((h && h.fehler) || "Keine Statistikdaten");
       hSetzen(h);
-      store.set("kb_hist", JSON.stringify({ version: h.version, manager: h.manager, spieler: h.spieler, z: h.z, bilder: h.bilder }));
+      store.set("kb_hist", JSON.stringify({ version: h.version, manager: h.manager, spieler: h.spieler, z: h.z, bilder: h.bilder, medaillen: h.medaillen }));
     } catch (e) {
       hFehler = e.message;
     }
@@ -1088,6 +1234,7 @@ section[hidden] { display: none; }
           sa.bestTag + ' · Liga Ø ' + NF0(lb) + '</div></div>';
       })() : kachel(m.g + m.r, "Karten", x => x.g + x.r, v => NF1.format(v))) + '</div>' +
       '<p class="erklaer" style="margin-top:8px">Plus und Minus im Vergleich zum Liga-Schnitt. Exklusiv: Punkte von Spielern, die am Spieltag kein anderer Manager hatte.</p>';
+    h += profilMedaillen(m.id);
 
     // Stamm-Elf
     const meist = [...m.spieler.values()];
@@ -1131,11 +1278,273 @@ section[hidden] { display: none; }
     if (m.id !== ich) h += '<button class="knopf gold" style="margin-top:24px" data-ich="' + esc(m.id) + '">Das bin ich</button>';
     return h;
   }
+  // ------------------------------------------------------------ Medaillen
+  // Vergabe im Apps Script (montags nach dem Festschreiben), hier nur Anzeige.
+  // H.medaillen: [Spieltag, Kategorie, Stufe, Titel, Manager-ID, Wert, Begründung]
+  const STUFEN = {
+    legende: { name: "Legendär", wert: 5 }, gold: { name: "Gold", wert: 3 }, silber: { name: "Silber", wert: 2 },
+    bronze: { name: "Bronze", wert: 1 }, holz: { name: "Holz", wert: 0 },
+  };
+  const STUFEN_REIHE = ["legende", "gold", "silber", "bronze", "holz"];
+  const KAT = {
+    tore: ["Torfabrik", "silber", "ball", "Die meisten Tore aller aufgestellten Spieler am Spieltag (mindestens 2)."],
+    vorlagen: ["Assistenzarzt", "bronze", "pass", "Die meisten Vorlagen der eigenen Elf (mindestens 2)."],
+    mauer: ["Betonmauer", "silber", "mauer", "Die meisten Punkte aus Tor und Abwehr."],
+    motor: ["Mittelfeldmotor", "bronze", "zahnrad", "Die meisten Punkte aus dem Mittelfeld."],
+    sturm: ["Sturmflut", "bronze", "blitz", "Die meisten Punkte aus dem Sturm."],
+    kapitaen: ["Goldene Binde", "gold", "binde", "Der beste Kapitän des Spieltags (mindestens 100 Punkte, zählt doppelt)."],
+    trueffel: ["Trüffelschwein", "gold", "lupe", "Der beste Spieler, den sonst kein Manager aufgestellt hatte (mindestens 120 Punkte)."],
+    querdenker: ["Querdenker", "bronze", "birne", "Die meisten Spieler, die sonst niemand aufgestellt hatte (mindestens 3)."],
+    sparfuchs: ["Sparfuchs", "silber", "muenzen", "Die meisten Punkte je Million Kaderwert."],
+    stabil: ["Keine Schwachstelle", "silber", "schild", "Der beste schwächste Spieler: alle Elf mit mindestens 40 Punkten."],
+    joker: ["Jokerkönig", "bronze", "karte", "Die meisten Punkte von eingewechselten Spielern (mindestens 60)."],
+    hexer: ["Hexer", "bronze", "hand", "Der beste Torwart des Spieltags (mindestens 100 Punkte)."],
+    rakete: ["Raketenstart", "gold", "rakete", "Der größte Sprung in der Gesamtwertung (mindestens 2 Plätze)."],
+    ueber: ["Über sich hinaus", "silber", "trend", "Am weitesten über dem eigenen Saisonschnitt (mindestens 150 Punkte)."],
+    verein: ["Vereinsbrille", "bronze", "trikot", "Die meisten Punkte aus drei Spielern desselben Vereins (mindestens 300)."],
+    hattrick: ["Hattrick-Held", "legende", "drei", "Ein Spieler der eigenen Elf trifft dreimal. Nur legendär, wenn höchstens 3 Manager ihn hatten."],
+    perfekt: ["Perfekte Elf", "legende", "krone", "Alle 11 Spieler holen mindestens 100 Punkte."],
+    volltreffer: ["Kapitäns-Volltreffer", "legende", "ziel", "Der Kapitän ist der beste Spieler des ganzen Spieltags (mindestens 200 Punkte)."],
+    zweitausend: ["2000er-Club", "legende", "diamant", "Mindestens 2.000 Punkte an einem Spieltag."],
+    karten: ["Kartensammler", "holz", "karten", "Schmach-Preis: die meisten Karten der eigenen Spieler (Gelb 1, Rot 2)."],
+    fehlgriff: ["Fehlgriff", "holz", "daumen", "Schmach-Preis: der schwächste Kapitän (höchstens 60 Punkte)."],
+    bank: ["Bankdrücker", "holz", "bank", "Schmach-Preis: die meisten Spieler ohne eine Minute Einsatz."],
+    minus: ["Minusgeschäft", "holz", "minus", "Schmach-Preis: der Spieler mit den meisten Minuspunkten in der eigenen Elf."],
+  };
+  const ICON = {
+    ball: '<circle cx="12" cy="12" r="9"/><path d="M12 8.2l3.2 2.3-1.2 3.8h-4l-1.2-3.8zM12 8.2V3M15.2 10.5l4.5-1.5M14 14.3l2.8 3.8M10 14.3l-2.8 3.8M8.8 10.5L4.3 9"/>',
+    pass: '<circle cx="5.5" cy="18" r="2.2"/><path d="M8 16.5C11 10 15 7.5 20 7.5M16.5 4.5l3.5 3-3.5 3"/>',
+    mauer: '<path d="M3 5.5h18v14H3zM3 10.2h18M3 14.8h18M9 5.5v4.7M15 5.5v4.7M6 10.2v4.6M12 10.2v4.6M18 10.2v4.6M9 14.8v4.7M15 14.8v4.7"/>',
+    zahnrad: '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
+    blitz: '<path d="M13.5 2L5 13.5h6.5L10.5 22 19 10.5h-6.5z"/>',
+    binde: '<rect x="2.5" y="7.5" width="19" height="9" rx="2"/><path d="M14.6 10.2a2.6 2.6 0 1 0 0 3.6"/>',
+    lupe: '<circle cx="10" cy="10" r="6.5"/><path d="M14.8 14.8L21 21M10 6.8l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3z"/>',
+    birne: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>',
+    muenzen: '<ellipse cx="12" cy="6.5" rx="7" ry="2.6"/><path d="M5 6.5v4.5c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6.5M5 11v4.5c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V11"/>',
+    schild: '<path d="M12 2.8l8 3v6.2c0 4.4-3.3 7.9-8 9.2-4.7-1.3-8-4.8-8-9.2V5.8z"/><path d="M8.3 12.2l2.6 2.6 4.8-5.2"/>',
+    karte: '<rect x="5.5" y="2.5" width="13" height="19" rx="2"/><path d="M12 7.5l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.3-2.4 1.3.5-2.6-1.9-1.8 2.6-.4z"/>',
+    hand: '<path d="M7.5 12.5V6.8a1.5 1.5 0 0 1 3 0v4.7M10.5 11V4.6a1.5 1.5 0 0 1 3 0V11M13.5 11V5.8a1.5 1.5 0 0 1 3 0v6M16.5 12V8.8a1.5 1.5 0 0 1 3 0V14c0 4.2-3 7-7 7h-.6c-2.4 0-4-1.1-5.2-3L4.2 14.6a1.6 1.6 0 0 1 2.6-1.9l.7.8"/>',
+    rakete: '<path d="M12 2.5c3 2.4 4.6 6 4.4 10.2L14 15.5h-4l-2.4-2.8C7.4 8.5 9 4.9 12 2.5z"/><circle cx="12" cy="9" r="1.6"/><path d="M10 15.5l-1.2 4 3.2-2 3.2 2-1.2-4"/>',
+    trend: '<path d="M3 17.5l6-6 4 4 8-8M15 7.5h6v6"/>',
+    trikot: '<path d="M8.5 3.5 3 6.5l2 4.2 2.5-1.2V20.5h9V9.5l2.5 1.2 2-4.2-5.5-3c-.6 1.6-1.9 2.5-3.5 2.5S9.1 5.1 8.5 3.5z"/>',
+    drei: '<circle cx="12" cy="7" r="3.6"/><circle cx="6.5" cy="16" r="3.6"/><circle cx="17.5" cy="16" r="3.6"/>',
+    krone: '<path d="M3 19h18M4.2 16.5 3 7.5l5 4 4-7 4 7 5-4-1.2 9z"/>',
+    ziel: '<circle cx="11" cy="13" r="8"/><circle cx="11" cy="13" r="4.5"/><circle cx="11" cy="13" r="1.2"/><path d="M11 13l9-9M17 3.5h3.5V7"/>',
+    diamant: '<path d="M6.5 3.5h11l4 5.5L12 20.5 2.5 9z"/><path d="M2.5 9h19M9.5 3.5 12 9l2.5-5.5M12 9v11.5"/>',
+    karten: '<rect x="3.5" y="5" width="9" height="13.5" rx="1.5" transform="rotate(-10 8 11.75)"/><rect x="11" y="4.5" width="9" height="13.5" rx="1.5" transform="rotate(10 15.5 11.25)"/>',
+    daumen: '<path d="M7.5 4v10M7.5 14l4 7c1.2 0 2.2-1 2.2-2.2V15h5.2a2 2 0 0 0 2-2.3l-1.1-6.6A2.4 2.4 0 0 0 17.4 4H7.5M3 4h4.5v10H3z"/>',
+    bank: '<path d="M3 10h18M3 13.5h18M4.5 13.5v6M19.5 13.5v6M6 6h12v4H6z"/>',
+    minus: '<path d="M3 6.5l6 6 4-4 8 8M15 16.5h6v-6"/>',
+    stern: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+    frage: '<path d="M9 9a3 3 0 1 1 4.2 2.8c-.8.4-1.2 1-1.2 1.9v.8M12 17.5v.5"/>',
+  };
+  const katInfo = k => { const x = KAT[k] || [k, "bronze", "stern", ""]; return { titel: x[0], stufe: x[1], icon: x[2], text: x[3] }; };
+  let mzId = 0;
+
+  function medInstanzen() {
+    const L = (H && H.medaillen) || [];
+    const map = new Map();
+    L.forEach(r => {
+      const key = r[0] + "|" + r[1];
+      let x = map.get(key);
+      if (!x) map.set(key, x = { d: r[0], kat: r[1], stufe: STUFEN[r[2]] ? r[2] : katInfo(r[1]).stufe, titel: r[3] || katInfo(r[1]).titel, wert: r[5], sieger: [] });
+      x.sieger.push({ mid: r[4], text: r[6] });
+    });
+    return [...map.values()].sort((a, b) => b.d - a.d || STUFEN[b.stufe].wert - STUFEN[a.stufe].wert);
+  }
+  const medNeuester = () => { const L = (H && H.medaillen) || []; return L.length ? Math.max(...L.map(r => r[0])) : 0; };
+  const medGesehen = () => Number(store.get("kb_med_gesehen") || 0);
+
+  // Münze als SVG: Vorderseite mit Symbol und Bogenschrift, Rückseite mit Gewinner
+  function muenzeSvg(stufe, kat, d, seite, unten, mitText) {
+    const i = katInfo(kat);
+    const id = "mz" + (++mzId);
+    const gr = "url(#mr-" + stufe + ")", fl = "url(#mf-" + stufe + ")";
+    let s = '<svg viewBox="0 0 200 200" aria-hidden="true" class="msvg">' +
+      '<circle cx="100" cy="100" r="99" fill="' + gr + '"/>' +
+      '<circle cx="100" cy="100" r="93.5" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="6" stroke-dasharray="1.3 2.4"/>' +
+      '<circle cx="100" cy="100" r="86" fill="' + fl + '" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/>' +
+      (stufe === "holz" ? '<circle cx="100" cy="100" r="86" fill="url(#holzmaser)"/>' : "") +
+      '<circle cx="100" cy="100" r="76" fill="none" class="gr" stroke-width="1.4" opacity=".55"/>';
+    const praeg = inner => '<g class="hl">' + inner + '</g><g class="gr">' + inner + '</g>';
+    if (mitText) {
+      s += '<path id="' + id + 'o" d="M28 100A72 72 0 0 1 172 100" fill="none"/><path id="' + id + 'u" d="M19 100A81 81 0 0 0 181 100" fill="none"/>';
+      const oben = seite === "hinten" ? "Männer Kickbase" : i.titel;
+      const ut = seite === "hinten" ? STUFEN[stufe].name : (d ? "Spieltag " + d : STUFEN[stufe].name);
+      const groesse = Math.min(15, 210 / Math.max(8, oben.length));
+      s += praeg('<text class="bogen" style="font-size:' + groesse.toFixed(1) + 'px"><textPath href="#' + id + 'o" startOffset="50%" text-anchor="middle">' + esc(oben.toUpperCase()) + '</textPath></text>' +
+        '<text class="bogen" style="font-size:11px"><textPath href="#' + id + 'u" startOffset="50%" text-anchor="middle">★ ' + esc(ut.toUpperCase()) + ' ★</textPath></text>');
+    }
+    if (seite === "hinten") {
+      const n = String(unten || "");
+      const g = Math.min(30, 300 / Math.max(6, n.length));
+      s += praeg('<text x="100" y="' + (100 + g * 0.35) + '" text-anchor="middle" class="name" style="font-size:' + g.toFixed(1) + 'px">' + esc(n.toUpperCase()) + '</text>');
+    } else {
+      s += praeg('<g transform="translate(100 102) scale(' + (mitText ? 2.9 : 3.7) + ') translate(-12 -12)" fill="none" stroke-width="' + (mitText ? 1.6 : 1.8) + '" stroke-linecap="round" stroke-linejoin="round" class="ic">' + (ICON[i.icon] || ICON.stern) + '</g>');
+    }
+    return s + '</svg>';
+  }
+  function muenze3d(inst, groesse, o) {
+    o = o || {};
+    const name = o.name || (inst.sieger.length === 1 ? mgName(inst.sieger[0].mid) : inst.sieger.length + " Sieger");
+    let rand = "";
+    for (let z = -4; z <= 4; z++) rand += '<i style="transform:translateZ(' + z + 'px)"></i>';
+    return '<div class="m3d t-' + inst.stufe + '" style="--g:' + groesse + 'px;--verz:' + (o.verz || 0) + 's" aria-hidden="true"><div class="dreh">' +
+      '<div class="seite vorn">' + muenzeSvg(inst.stufe, inst.kat, inst.d, "vorn", "", true) + '</div><div class="rand">' + rand + '</div>' +
+      '<div class="seite hinten">' + muenzeSvg(inst.stufe, inst.kat, inst.d, "hinten", name, true) + '</div></div></div>';
+  }
+  function miniMuenze(stufe, kat, cls, gesperrt) {
+    if (gesperrt) {
+      return '<span class="mm zu ' + (cls || "") + '" aria-hidden="true"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="99" fill="#26262A"/>' +
+        '<circle cx="100" cy="100" r="86" fill="#1C1C1F" stroke="#333338" stroke-width="2" stroke-dasharray="3 5"/><g transform="translate(100 100) scale(3) translate(-12 -12)" fill="none" stroke="#55555B" stroke-width="1.8" stroke-linecap="round">' + ICON.frage + '</g></svg></span>';
+    }
+    return '<span class="mm t-' + stufe + ' ' + (cls || "") + '" aria-hidden="true">' + muenzeSvg(stufe, kat, 0, "vorn", "", false) + '</span>';
+  }
+  function mgName(id) {
+    if (D) { const m = D.manager.find(x => x.id === id); if (m) return m.name; const s = (D.saison || []).find(x => x.id === id); if (s) return s.name; }
+    return (H && H.manager && H.manager[id]) || id;
+  }
+  const stufePill = s => '<span class="stufe t-' + s + '">' + STUFEN[s].name + '</span>';
+  function medJeManager() {
+    const je = {};
+    medInstanzen().forEach(inst => inst.sieger.forEach(s => (je[s.mid] = je[s.mid] || []).push(Object.assign({}, inst, { text: s.text }))));
+    return je;
+  }
+
+  function renderMedaillen() {
+    const el = document.getElementById("v-medaillen");
+    const leer = statLeer();
+    if (leer) { setzen(el, leer); return; }
+    const alle = medInstanzen();
+    if (!alle.length) {
+      setzen(el, '<div class="held"><h1>Medaillen</h1></div>' + hinweis("Noch keine Medaillen", "Im Google Sheet einmal ⚽ Kickbase → 🏅 Medaillen jetzt vergeben ausführen. Danach kommen jeden Montag um 19 Uhr neue dazu."));
+      return;
+    }
+    const neu = medNeuester();
+    const diese = alle.filter(x => x.d === neu);
+    let h = '<div class="held"><h1>Medaillen</h1><p class="lage">Spieltag ' + neu + ' · ' + diese.length + (diese.length === 1 ? " Medaille" : " Medaillen") + ' vergeben · neue jeden Montag 19 Uhr</p></div>';
+    h += '<div class="vitrine" id="vitrine">' + diese.map((inst, i) => '<article class="mk t-' + inst.stufe + '"><div class="strahlen"></div>' +
+      '<button class="m-tipp" data-medaille="' + esc(inst.kat + "|" + inst.d) + '" aria-label="' + esc(inst.titel + ", Details") + '">' + muenze3d(inst, 172, { verz: -i * 2.1 }) + '</button>' +
+      stufePill(inst.stufe) + '<h3>' + esc(inst.titel) + '</h3>' +
+      '<p class="grund">' + esc(inst.sieger[0].text) + (inst.sieger.length > 1 ? " (geteilt)" : "") + '</p>' +
+      '<div class="sieger">' + inst.sieger.map(s => '<span>' + managerAva(s.mid, mgName(s.mid), "s28") + esc(mgName(s.mid)) + duTag(s.mid) + '</span>').join("") + '</div></article>').join("") + '</div>';
+    if (diese.length > 1) h += '<div class="punkte-nav" aria-hidden="true">' + diese.map((_, i) => '<i' + (i ? "" : ' class="an"') + '></i>').join("") + '</div>';
+
+    // Sammlung: Rangliste nach Medaillenwert
+    const je = medJeManager();
+    const ids = new Set(Object.keys((H && H.manager) || {}));
+    ((D && D.manager) || []).forEach(m => ids.add(m.id));
+    const reihen = [...ids].map(id => {
+      const l = (je[id] || []).slice().sort((a, b) => STUFEN[b.stufe].wert - STUFEN[a.stufe].wert || b.d - a.d);
+      const zahl = {}; l.forEach(x => { zahl[x.stufe] = (zahl[x.stufe] || 0) + 1; });
+      return { id, name: mgName(id), l, zahl, wert: l.reduce((a, x) => a + STUFEN[x.stufe].wert, 0) };
+    }).sort((a, b) => b.wert - a.wert || b.l.length - a.l.length || a.name.localeCompare(b.name, "de"));
+    h += '<h2>Sammlung</h2><p class="erklaer">Legendär 5, Gold 3, Silber 2, Bronze 1 Punkt. Holz zählt nichts, bleibt aber für immer im Schrank.</p><ol class="liste">';
+    let platz = 0, vorher = null;
+    reihen.forEach((r, i) => {
+      if (r.wert !== vorher) { platz = i + 1; vorher = r.wert; }
+      const auf = MX.auf === r.id;
+      const info = STUFEN_REIHE.filter(s => r.zahl[s]).map(s => '<span class="zaehl t-' + s + '"><i></i>' + r.zahl[s] + '</span>').join("") || '<span>noch keine</span>';
+      h += '<li class="rz' + (r.id === ich ? " meins" : "") + '"><button class="reihe" data-schrank="' + esc(r.id) + '" aria-expanded="' + auf + '">' +
+        managerAva(r.id, r.name, "s48") + '<span class="name">' + esc(r.name) + duTag(r.id) + '</span><span class="info">' + rp(platz) + info + '</span>' +
+        '<span class="wert zahl">' + r.wert + '</span></button>' + (auf ? schrank(r) : "") + '</li>';
+    });
+    h += '</ol>';
+
+    // Album: alle Kategorien, noch nie vergebene gesperrt
+    const proKat = {};
+    alle.forEach(x => { (proKat[x.kat] = proKat[x.kat] || []).push(x); });
+    h += '<h2>Album</h2><p class="erklaer">Jeden Montag werden drei Kategorien zufällig gezogen. Legendäre gibt es nur, wenn etwas Besonderes passiert. ' +
+      Object.keys(proKat).length + ' von ' + Object.keys(KAT).length + ' schon vergeben.</p><div class="album">' +
+      Object.keys(KAT).sort((a, b) => STUFEN[katInfo(b).stufe].wert - STUFEN[katInfo(a).stufe].wert || (proKat[b] ? 1 : 0) - (proKat[a] ? 1 : 0)).map(k => {
+        const i = katInfo(k), n = proKat[k] ? proKat[k].length : 0;
+        return '<button class="alb" data-kat="' + k + '">' + miniMuenze(i.stufe, k, "", !n) + '<b>' + esc(n ? i.titel : "???") + '</b><span>' +
+          (n ? n + "× vergeben" : STUFEN[i.stufe].name) + '</span></button>';
+      }).join("") + '</div>';
+    if (setzen(el, h)) vitrineNav();
+  }
+  function schrank(r) {
+    if (!r.l.length) return '<div class="aufzu"><p class="leise" style="margin:0">Noch keine Medaille. Nächste Chance: Montag 19 Uhr.</p></div>';
+    return '<div class="aufzu schrank">' + r.l.map(x => '<button class="sm" data-medaille="' + esc(x.kat + "|" + x.d + "|" + r.id) + '">' + miniMuenze(x.stufe, x.kat) +
+      '<b>' + esc(x.titel) + '</b><span>ST ' + x.d + '</span></button>').join("") + '</div>';
+  }
+  function vitrineNav() {
+    const v = document.getElementById("vitrine"), nav = document.querySelector(".punkte-nav");
+    if (!v || !nav) return;
+    v.addEventListener("scroll", () => {
+      const k = [...v.children];
+      const mitte = v.scrollLeft + v.clientWidth / 2;
+      let best = 0, ab = 1e9;
+      k.forEach((c, i) => { const a = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mitte); if (a < ab) { ab = a; best = i; } });
+      [...nav.children].forEach((p, i) => p.classList.toggle("an", i === best));
+    }, { passive: true });
+  }
+  function enthuellen() {
+    const neu = medNeuester();
+    if (!neu || neu <= medGesehen()) return;
+    const v = document.getElementById("vitrine");
+    if (v) { v.classList.add("enthuellen"); setTimeout(() => v.classList.remove("enthuellen"), 2600); }
+    store.set("kb_med_gesehen", String(neu));
+    medPunkt();
+  }
+  function medPunkt() {
+    const b = document.querySelector('nav.tabs button[data-v="medaillen"]');
+    if (b) b.classList.toggle("neu", medNeuester() > medGesehen());
+  }
+  function medBanner() {
+    const neu = medNeuester();
+    if (!neu || neu <= medGesehen()) return "";
+    const d = medInstanzen().filter(x => x.d === neu);
+    return '<button class="med-banner" data-v="medaillen">' + d.slice(0, 3).map(x => miniMuenze(x.stufe, x.kat, "klein")).join("") +
+      '<span><b>Neu: ' + d.length + ' Medaillen</b>für Spieltag ' + neu + ' vergeben</span>' + SVG_PFEIL + '</button>';
+  }
+  function profilMedaillen(id) {
+    const l = (medJeManager()[id] || []).slice().sort((a, b) => STUFEN[b.stufe].wert - STUFEN[a.stufe].wert || b.d - a.d);
+    if (!l.length) return "";
+    return '<h2>Medaillen</h2><div class="aufzu schrank" style="padding-left:0">' + l.map(x => '<button class="sm" data-medaille="' + esc(x.kat + "|" + x.d + "|" + id) + '">' +
+      miniMuenze(x.stufe, x.kat) + '<b>' + esc(x.titel) + '</b><span>ST ' + x.d + '</span></button>').join("") + '</div>';
+  }
+
+  // Detailblatt (von unten), Zurück-Taste schließt es
+  let blattOffen = false;
+  function blattAuf(kat, d, mid) {
+    const i = katInfo(kat);
+    const alle = medInstanzen().filter(x => x.kat === kat);
+    const inst = alle.find(x => x.d === d) || alle[0];
+    const kopf = inst ? muenze3d(inst, 210, { name: mid ? mgName(mid) : null }) : '<div class="m-gesperrt">' + miniMuenze(i.stufe, kat, "gross", true) + '</div>';
+    let h = '<div class="griff"></div><button class="blatt-zu" data-zu="1" aria-label="Schließen">×</button><div class="blatt-kopf"><div class="strahlen"></div>' + kopf + '</div>' +
+      stufePill(i.stufe) + '<h2 class="blatt-titel">' + esc(inst ? i.titel : "Noch nicht vergeben") + '</h2>' +
+      '<p class="wofuer">' + esc(i.text) + '</p>';
+    if (alle.length) {
+      h += '<h3 class="blatt-h3">Vergeben</h3>' + alle.map(x => x.sieger.map(s => '<div class="ez' + (s.mid === mid && x.d === d ? " hervor" : "") + '"><span class="d">ST ' + x.d + '</span>' +
+        managerAva(s.mid, mgName(s.mid), "s40") + '<span class="n"><span>' + esc(mgName(s.mid)) + duTag(s.mid) + '</span><em>' + esc(s.text) + '</em></span></div>').join("")).join("");
+    } else {
+      h += '<p class="leise">Diese Medaille hat noch niemand. Wer holt sie als Erster?</p>';
+    }
+    const b = document.getElementById("blatt");
+    b.innerHTML = '<div class="blatt-innen">' + h + '</div>';
+    document.getElementById("blatt-hg").hidden = false; b.hidden = false;
+    requestAnimationFrame(() => { b.classList.add("offen"); document.getElementById("blatt-hg").classList.add("offen"); });
+    document.body.classList.add("blatt-an");
+    if (!blattOffen) { try { history.pushState({ kbBlatt: 1, kbProfil: SX.profil }, ""); } catch (e) { /* egal */ } }
+    blattOffen = true;
+  }
+  function blattZu(ausHistorie) {
+    if (!blattOffen) return;
+    blattOffen = false;
+    const b = document.getElementById("blatt"), hg = document.getElementById("blatt-hg");
+    b.classList.remove("offen"); hg.classList.remove("offen");
+    document.body.classList.remove("blatt-an");
+    setTimeout(() => { if (!blattOffen) { b.hidden = true; hg.hidden = true; b.innerHTML = ""; } }, 320);
+    if (!ausHistorie && history.state && history.state.kbBlatt) history.back();
+  }
+  document.addEventListener("keydown", e => { if (e.key === "Escape") blattZu(); });
+
   function chipSichtbar(el) {
     const c = el.querySelector(".seg:not(.klein)"), a = c && c.querySelector('[aria-pressed="true"]');
     if (a && a.offsetLeft + a.offsetWidth > c.clientWidth) c.scrollLeft = a.offsetLeft + a.offsetWidth - c.clientWidth + 16;
   }
-  function renderStats() { renderSpieler(); renderManager(); }
+  function renderStats() { renderSpieler(); renderManager(); renderMedaillen(); medPunkt(); }
   function profilAuf(id) {
     SX.profil = id;
     try { history.pushState({ kbProfil: id }, ""); } catch (e) { /* egal */ }
@@ -1147,6 +1556,7 @@ section[hidden] { display: none; }
     SX.profil = null; renderManager(); window.scrollTo(0, 0);
   }
   window.addEventListener("popstate", e => {
+    if (blattOffen) { blattZu(true); return; }
     SX.profil = (e.state && e.state.kbProfil) || null;
     if (D) renderManager();
     window.scrollTo(0, 0);
@@ -1170,15 +1580,20 @@ section[hidden] { display: none; }
   function wechseln(v) {
     ansicht = v; store.set("kb_ansicht", v);
     document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.v === v));
-    ["live", "strafen", "saison", "spieler", "manager"].forEach(x => { document.getElementById("v-" + x).hidden = x !== v; });
+    ["live", "strafen", "saison", "spieler", "manager", "medaillen"].forEach(x => { document.getElementById("v-" + x).hidden = x !== v; });
     chipSichtbar(document.getElementById("v-" + v));
     window.scrollTo(0, 0);
+    if (v === "medaillen") setTimeout(enthuellen, 60);
   }
   function statNeu(fn) { fn(); statKey = ""; SX.alle = false; SX.auf = null; renderStats(); }
 
   document.addEventListener("click", e => {
+    if (e.target.closest("[data-zu]")) { blattZu(); return; }
     const t = e.target.closest("button, tr[data-g]");
     if (!t) return;
+    if (t.dataset.medaille) { const [k, d, mid] = t.dataset.medaille.split("|"); blattAuf(k, Number(d), mid || null); return; }
+    if (t.dataset.kat) { const l = medInstanzen().filter(x => x.kat === t.dataset.kat); blattAuf(t.dataset.kat, l.length ? l[0].d : 0, null); return; }
+    if (t.dataset.schrank) { MX.auf = MX.auf === t.dataset.schrank ? null : t.dataset.schrank; renderMedaillen(); return; }
     if (t.dataset.v) {
       if (t.dataset.v === "manager" && ansicht === "manager" && SX.profil) { profilZu(); return; }
       wechseln(t.dataset.v); return;
